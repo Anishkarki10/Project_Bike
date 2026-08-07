@@ -1,12 +1,847 @@
-{% extends 'admin/base.html' %}{% block title %}{{ 'Edit Bike' if mode=='edit' else 'Add Bike' }} — Admin{% endblock %}{% block content %}
-<div><a class="text-sm text-gray-500" href="{{ url_for('admin.bikes') }}">← Back to bikes</a><h1 class="font-display text-4xl font-extrabold mt-2">{{ 'Edit Bike' if mode=='edit' else 'Add New Bike' }}</h1><p class="text-gray-500 mt-1">Enter the details customers should see on the public listing.</p></div>
-<form method="POST" enctype="multipart/form-data" class="space-y-6 mt-7 max-w-5xl">
-  {% set b = bike or {} %}
-  <section class="form-card"><h2 class="form-title">Basic Information</h2><div class="grid md:grid-cols-2 gap-4"><div><label class="label">Bike Name *</label><input class="field" name="name" required value="{{ b.name or '' }}"></div><div><label class="label">Brand *</label><input class="field" name="brand" required value="{{ b.brand or '' }}"></div><div><label class="label">Model *</label><input class="field" name="model" required value="{{ b.model or '' }}"></div><div><label class="label">Category *</label><select class="field" name="category"><option value="motorcycle" {% if b.category=='motorcycle' %}selected{% endif %}>Motorcycle</option><option value="scooter" {% if b.category=='scooter' %}selected{% endif %}>Scooter</option></select></div><div><label class="label">Model Year *</label><input class="field" type="number" name="year" required value="{{ b.year or '' }}"></div><div><label class="label">Status</label><select class="field" name="status"><option value="available" {% if b.status=='available' %}selected{% endif %}>Available</option><option value="sold" {% if b.status=='sold' %}selected{% endif %}>Sold</option><option value="draft" {% if b.status=='draft' %}selected{% endif %}>Draft</option></select></div></div></section>
-  <section class="form-card"><h2 class="form-title">Vehicle Details</h2><div class="grid md:grid-cols-3 gap-4"><div><label class="label">Engine CC</label><input class="field" type="number" name="engine_cc" value="{{ b.engine_cc or '' }}"></div><div><label class="label">Kilometres Travelled</label><input class="field" type="number" name="km_travelled" value="{{ b.km_travelled or 0 }}"></div><div><label class="label">Fuel Type</label><input class="field" name="fuel_type" value="{{ b.fuel_type or 'Petrol' }}"></div><div><label class="label">Transmission</label><input class="field" name="transmission" value="{{ b.transmission or '' }}"></div><div><label class="label">Colour</label><input class="field" name="colour" value="{{ b.colour or '' }}"></div><div><label class="label">Condition</label><input class="field" name="condition_text" value="{{ b.condition_text or '' }}" placeholder="Excellent / Good"></div><div><label class="label">Owners</label><input class="field" type="number" name="owners" value="{{ b.owners or 1 }}"></div><div class="md:col-span-2"><label class="label">Registration / Lot Number</label><input class="field" name="reg_number" value="{{ b.reg_number or '' }}"></div></div></section>
-  <section class="form-card"><h2 class="form-title">Pricing</h2><div class="grid md:grid-cols-2 gap-4"><div><label class="label">Selling Price (NPR) *</label><input class="field" type="number" step="0.01" name="price" required value="{{ b.price or '' }}"></div><div><label class="label">Previous / Original Price</label><input class="field" type="number" step="0.01" name="original_price" value="{{ b.original_price or '' }}"></div></div></section>
-  <section class="form-card"><h2 class="form-title">Description</h2><div class="space-y-4"><div><label class="label">Short Description</label><textarea class="field min-h-24" name="short_description">{{ b.short_description or '' }}</textarea></div><div><label class="label">Full Description</label><textarea class="field min-h-36" name="full_description">{{ b.full_description or '' }}</textarea></div><div><label class="label">Features (comma separated)</label><input class="field" name="features" value="{{ b.features or '' }}" placeholder="ABS, LED Headlight, Slipper Clutch"></div><div class="grid md:grid-cols-3 gap-4"><div><label class="label">Known Issues</label><textarea class="field min-h-28" name="known_issues">{{ b.known_issues or '' }}</textarea></div><div><label class="label">Service Information</label><textarea class="field min-h-28" name="service_info">{{ b.service_info or '' }}</textarea></div><div><label class="label">Documentation</label><textarea class="field min-h-28" name="doc_info">{{ b.doc_info or '' }}</textarea></div></div></div></section>
-  <section class="form-card"><h2 class="form-title">Images</h2><div class="grid md:grid-cols-2 gap-4"><div><label class="label">Main Cover Image</label><input class="file-field" type="file" name="cover_image" accept="image/*">{% if b.cover_image %}<p class="text-xs text-gray-400 mt-2">Current: {{ b.cover_image }}</p>{% endif %}</div><div><label class="label">Gallery Images</label><input class="file-field" type="file" name="gallery_images" accept="image/*" multiple><p class="text-xs text-gray-400 mt-2">On edit, selecting new gallery images replaces the old gallery.</p></div></div></section>
-  <div class="flex gap-3"><button class="btn-red px-7 py-3">{{ 'Save Changes' if mode=='edit' else 'Publish Bike' }}</button><a class="px-7 py-3 rounded-lg border border-gray-300 font-semibold" href="{{ url_for('admin.bikes') }}">Cancel</a></div>
-</form>
+{% extends "admin/base.html" %}
+
+{% block title %}
+{{ "Edit Bike" if mode == "edit" else "Add Bike" }} — Admin
+{% endblock %}
+
+{% block content %}
+
+<div>
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+    <div>
+
+        <a
+            class="text-sm text-gray-500 hover:text-gray-900"
+            href="{{ url_for('admin.bikes') }}"
+        >
+            ← Back to bikes
+        </a>
+
+        <h1 class="font-display text-4xl font-extrabold mt-2">
+            {{ "Edit Bike" if mode == "edit" else "Add New Bike" }}
+        </h1>
+
+        <p class="text-gray-500 mt-1">
+            Enter vehicle, purchase and public listing information.
+        </p>
+
+    </div>
+
+
+    {% set b = bike or {} %}
+
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+        class="space-y-6 mt-7 max-w-5xl"
+    >
+
+
+        <!-- =================================================
+             BASIC INFORMATION
+        ================================================== -->
+        <section class="form-card">
+
+            <h2 class="form-title">
+                Basic Information
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-4">
+
+
+                <!-- Bike Name -->
+                <div>
+
+                    <label class="label">
+                        Bike Name *
+                    </label>
+
+                    <input
+                        class="field"
+                        name="name"
+                        required
+                        value="{{ b.name or '' }}"
+                        placeholder="Example: Yamaha MT-15 V2"
+                    >
+
+                </div>
+
+
+                <!-- Brand -->
+                <div>
+
+                    <label class="label">
+                        Brand *
+                    </label>
+
+                    <input
+                        class="field"
+                        name="brand"
+                        required
+                        value="{{ b.brand or '' }}"
+                        placeholder="Example: Yamaha"
+                    >
+
+                </div>
+
+
+                <!-- Model -->
+                <div>
+
+                    <label class="label">
+                        Model *
+                    </label>
+
+                    <input
+                        class="field"
+                        name="model"
+                        required
+                        value="{{ b.model or '' }}"
+                        placeholder="Example: MT-15 V2"
+                    >
+
+                </div>
+
+
+                <!-- Category -->
+                <div>
+
+                    <label class="label">
+                        Category *
+                    </label>
+
+                    <select
+                        class="field"
+                        name="category"
+                        required
+                    >
+
+                        <option
+                            value="motorcycle"
+                            {% if b.category == "motorcycle" %}
+                                selected
+                            {% endif %}
+                        >
+                            Motorcycle
+                        </option>
+
+                        <option
+                            value="scooter"
+                            {% if b.category == "scooter" %}
+                                selected
+                            {% endif %}
+                        >
+                            Scooter
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Model Year -->
+                <div>
+
+                    <label class="label">
+                        Model Year *
+                    </label>
+
+                    <input
+                        class="field"
+                        type="number"
+                        name="year"
+                        min="1900"
+                        max="2100"
+                        required
+                        value="{{ b.year or '' }}"
+                        placeholder="2024"
+                    >
+
+                </div>
+
+
+                <!-- Date Added -->
+                <div>
+
+                    <label class="label">
+                        Date Added
+                    </label>
+
+                    <input
+                        class="field"
+                        type="date"
+                        name="date_added"
+                        value="{{ b.date_added or '' }}"
+                    >
+
+                    <p class="text-xs text-gray-400 mt-1">
+                        Leave empty to use today's date.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PURCHASE INFORMATION
+        ================================================== -->
+        <section class="form-card">
+
+            <div class="flex items-center justify-between gap-4">
+
+                <div>
+
+                    <h2 class="form-title">
+                        Purchase Information
+                    </h2>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Admin-only information used for profit calculation.
+                    </p>
+
+                </div>
+
+                <span
+                    class="px-3 py-1 rounded-full
+                           bg-red-50 text-red-700
+                           text-xs font-semibold"
+                >
+                    Private
+                </span>
+
+            </div>
+
+
+            <div class="grid md:grid-cols-2 gap-4 mt-5">
+
+
+                <!-- Purchase Price -->
+                <div>
+
+                    <label class="label">
+                        Purchase Price (NPR) *
+                    </label>
+
+                    <input
+                        class="field"
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        name="purchase_price"
+                        required
+                        value="{{ b.purchase_price or '' }}"
+                        placeholder="Example: 250000"
+                    >
+
+                    <p class="text-xs text-gray-400 mt-1">
+                        Amount Supa Auto Link paid to acquire this bike.
+                    </p>
+
+                </div>
+
+
+                <!-- Purchase Date -->
+                <div>
+
+                    <label class="label">
+                        Purchase Date *
+                    </label>
+
+                    <input
+                        class="field"
+                        type="date"
+                        name="purchase_date"
+                        required
+                        value="{{ b.purchase_date or '' }}"
+                    >
+
+                </div>
+
+
+                <!-- Current Expenses -->
+                <div class="md:col-span-2">
+
+                    <label class="label">
+                        Current Additional Expenses
+                    </label>
+
+                    <input
+                        class="field"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        name="additional_expenses"
+                        value="{{ b.additional_expenses or 0 }}"
+                        placeholder="Example: 5000"
+                    >
+
+                    <p class="text-xs text-gray-400 mt-1">
+                        Repairs, servicing, detailing, transport or other costs already spent on this bike.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="mt-5 bg-blue-50 border border-blue-200
+                       rounded-xl p-4"
+            >
+
+                <p class="text-sm text-blue-800">
+
+                    <strong>Important:</strong>
+
+                    Purchase price and purchase date are required so the system can calculate the actual profit when the bike is sold.
+
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             VEHICLE DETAILS
+        ================================================== -->
+        <section class="form-card">
+
+            <h2 class="form-title">
+                Vehicle Details
+            </h2>
+
+
+            <div class="grid md:grid-cols-3 gap-4">
+
+
+                <!-- Engine -->
+                <div>
+
+                    <label class="label">
+                        Engine CC
+                    </label>
+
+                    <input
+                        class="field"
+                        type="number"
+                        name="engine_cc"
+                        min="0"
+                        value="{{ b.engine_cc or '' }}"
+                        placeholder="155"
+                    >
+
+                </div>
+
+
+                <!-- KM -->
+                <div>
+
+                    <label class="label">
+                        Kilometres Travelled
+                    </label>
+
+                    <input
+                        class="field"
+                        type="number"
+                        name="km_travelled"
+                        min="0"
+                        value="{{ b.km_travelled or 0 }}"
+                        placeholder="12500"
+                    >
+
+                </div>
+
+
+                <!-- Fuel -->
+                <div>
+
+                    <label class="label">
+                        Fuel Type
+                    </label>
+
+                    <input
+                        class="field"
+                        name="fuel_type"
+                        value="{{ b.fuel_type or 'Petrol' }}"
+                    >
+
+                </div>
+
+
+                <!-- Transmission -->
+                <div>
+
+                    <label class="label">
+                        Transmission
+                    </label>
+
+                    <input
+                        class="field"
+                        name="transmission"
+                        value="{{ b.transmission or '' }}"
+                        placeholder="Manual"
+                    >
+
+                </div>
+
+
+                <!-- Colour -->
+                <div>
+
+                    <label class="label">
+                        Colour
+                    </label>
+
+                    <input
+                        class="field"
+                        name="colour"
+                        value="{{ b.colour or '' }}"
+                    >
+
+                </div>
+
+
+                <!-- Condition -->
+                <div>
+
+                    <label class="label">
+                        Condition
+                    </label>
+
+                    <input
+                        class="field"
+                        name="condition_text"
+                        value="{{ b.condition_text or '' }}"
+                        placeholder="Excellent / Good"
+                    >
+
+                </div>
+
+
+                <!-- Owners -->
+                <div>
+
+                    <label class="label">
+                        Previous Owners
+                    </label>
+
+                    <input
+                        class="field"
+                        type="number"
+                        min="0"
+                        name="owners"
+                        value="{{ b.owners or 1 }}"
+                    >
+
+                </div>
+
+
+                <!-- Registration -->
+                <div class="md:col-span-2">
+
+                    <label class="label">
+                        Registration / Lot Number
+                    </label>
+
+                    <input
+                        class="field"
+                        name="reg_number"
+                        value="{{ b.reg_number or '' }}"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PUBLIC PRICING
+        ================================================== -->
+        <section class="form-card">
+
+            <h2 class="form-title">
+                Public Pricing
+            </h2>
+
+            <p class="text-sm text-gray-500 mb-4">
+                These prices can be displayed to visitors on the public website.
+            </p>
+
+
+            <div class="grid md:grid-cols-2 gap-4">
+
+
+                <!-- Selling Price -->
+                <div>
+
+                    <label class="label">
+                        Asking / Selling Price (NPR) *
+                    </label>
+
+                    <input
+                        class="field"
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        name="price"
+                        required
+                        value="{{ b.price or '' }}"
+                        placeholder="Example: 300000"
+                    >
+
+                </div>
+
+
+                <!-- Original Price -->
+                <div>
+
+                    <label class="label">
+                        Previous / Original Listing Price
+                    </label>
+
+                    <input
+                        class="field"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        name="original_price"
+                        value="{{ b.original_price or '' }}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="mt-5 bg-gray-50 border border-gray-200
+                       rounded-xl p-4"
+            >
+
+                <p class="text-sm text-gray-600">
+
+                    <strong>Purchase Price</strong>
+                    is private.
+
+                    <strong>Asking Price</strong>
+                    is what customers see.
+
+                    The final actual selling amount will be entered when you click
+                    <strong>Mark as Sold</strong>.
+
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             DESCRIPTION
+        ================================================== -->
+        <section class="form-card">
+
+            <h2 class="form-title">
+                Description
+            </h2>
+
+
+            <div class="space-y-4">
+
+
+                <!-- Short Description -->
+                <div>
+
+                    <label class="label">
+                        Short Description
+                    </label>
+
+                    <textarea
+                        class="field min-h-24"
+                        name="short_description"
+                    >{{ b.short_description or '' }}</textarea>
+
+                </div>
+
+
+                <!-- Full -->
+                <div>
+
+                    <label class="label">
+                        Full Description
+                    </label>
+
+                    <textarea
+                        class="field min-h-36"
+                        name="full_description"
+                    >{{ b.full_description or '' }}</textarea>
+
+                </div>
+
+
+                <!-- Features -->
+                <div>
+
+                    <label class="label">
+                        Features
+                    </label>
+
+                    <input
+                        class="field"
+                        name="features"
+                        value="{{ b.features or '' }}"
+                        placeholder="ABS, LED Headlight, Slipper Clutch"
+                    >
+
+                    <p class="text-xs text-gray-400 mt-1">
+                        Separate multiple features with commas.
+                    </p>
+
+                </div>
+
+
+                <div class="grid md:grid-cols-3 gap-4">
+
+
+                    <!-- Issues -->
+                    <div>
+
+                        <label class="label">
+                            Known Issues
+                        </label>
+
+                        <textarea
+                            class="field min-h-28"
+                            name="known_issues"
+                        >{{ b.known_issues or '' }}</textarea>
+
+                    </div>
+
+
+                    <!-- Service -->
+                    <div>
+
+                        <label class="label">
+                            Service Information
+                        </label>
+
+                        <textarea
+                            class="field min-h-28"
+                            name="service_info"
+                        >{{ b.service_info or '' }}</textarea>
+
+                    </div>
+
+
+                    <!-- Documentation -->
+                    <div>
+
+                        <label class="label">
+                            Documentation
+                        </label>
+
+                        <textarea
+                            class="field min-h-28"
+                            name="doc_info"
+                        >{{ b.doc_info or '' }}</textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             STATUS
+        ================================================== -->
+        {% if mode == "edit" %}
+
+        <section class="form-card">
+
+            <h2 class="form-title">
+                Current Status
+            </h2>
+
+
+            <div class="flex items-center gap-3 mt-3">
+
+                {% if b.status == "available" %}
+
+                    <span
+                        class="px-4 py-2 rounded-full
+                               bg-green-100 text-green-700
+                               font-semibold"
+                    >
+                        Available
+                    </span>
+
+                {% elif b.status == "sold" %}
+
+                    <span
+                        class="px-4 py-2 rounded-full
+                               bg-gray-200 text-gray-700
+                               font-semibold"
+                    >
+                        Sold
+                    </span>
+
+                {% else %}
+
+                    <span
+                        class="px-4 py-2 rounded-full
+                               bg-yellow-100 text-yellow-700
+                               font-semibold"
+                    >
+                        {{ b.status|title }}
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <p class="text-sm text-gray-500 mt-3">
+
+                Sale status is managed from the All Bikes page.
+
+                An available bike must go through the
+                <strong>Mark as Sold</strong>
+                process so sold price and profit information are recorded correctly.
+
+            </p>
+
+        </section>
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             IMAGES
+        ================================================== -->
+        <section class="form-card">
+
+            <h2 class="form-title">
+                Images
+            </h2>
+
+
+            <div class="grid md:grid-cols-2 gap-4">
+
+
+                <!-- Cover -->
+                <div>
+
+                    <label class="label">
+                        Main Cover Image
+                    </label>
+
+                    <input
+                        class="file-field"
+                        type="file"
+                        name="cover_image"
+                        accept="image/*"
+                    >
+
+
+                    {% if b.cover_image %}
+
+                        <div class="mt-3">
+
+                            <p class="text-xs text-gray-400 mb-2">
+                                Current cover
+                            </p>
+
+                            <img
+                                src="{{ b.cover_image if b.cover_image.startswith('http') else url_for('static', filename='uploads/bikes/' ~ b.cover_image) }}"
+                                class="w-40 h-28 rounded-xl object-cover border"
+                            >
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Gallery -->
+                <div>
+
+                    <label class="label">
+                        Gallery Images
+                    </label>
+
+                    <input
+                        class="file-field"
+                        type="file"
+                        name="gallery_images"
+                        accept="image/*"
+                        multiple
+                    >
+
+                    <p class="text-xs text-gray-400 mt-2">
+                        On edit, uploading new gallery images replaces the existing gallery.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+        <div class="flex flex-wrap gap-3 pb-8">
+
+            <button
+                type="submit"
+                class="btn-red px-7 py-3"
+            >
+
+                {% if mode == "edit" %}
+                    Save Changes
+                {% else %}
+                    Publish Bike
+                {% endif %}
+
+            </button>
+
+
+            <a
+                class="px-7 py-3 rounded-lg border
+                       border-gray-300 font-semibold
+                       hover:bg-gray-50"
+                href="{{ url_for('admin.bikes') }}"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+
+    </form>
+
+</div>
+
 {% endblock %}

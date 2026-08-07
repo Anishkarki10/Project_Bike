@@ -1,0 +1,550 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Sales & Profit - Supa Auto Link{% endblock %}
+
+{% block content %}
+
+<div class="p-6">
+
+    <!-- PAGE HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">
+                Sales & Profit
+            </h1>
+
+            <p class="text-gray-500 mt-1">
+                Track sold bikes, revenue, purchase costs, expenses and monthly profit.
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('admin.export_sales_csv', month=selected_month, year=selected_year) }}"
+            class="inline-flex items-center justify-center gap-2 px-5 py-3
+                   bg-green-600 text-white font-semibold rounded-xl
+                   hover:bg-green-700 transition shadow-sm"
+        >
+            <i class="fa-solid fa-file-csv"></i>
+            Export CSV
+        </a>
+
+    </div>
+
+
+    <!-- FILTER -->
+    <form
+        action="{{ url_for('admin.sales') }}"
+        method="GET"
+        class="bg-white border border-gray-200 rounded-2xl p-5 mb-8 shadow-sm"
+    >
+
+        <div class="flex flex-col md:flex-row gap-4 md:items-end">
+
+            <!-- MONTH -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Month
+                </label>
+
+                <select
+                    name="month"
+                    class="border border-gray-300 rounded-xl px-4 py-3 bg-white"
+                >
+
+                    {% for number, name in months %}
+
+                    <option
+                        value="{{ number }}"
+                        {% if number == selected_month %}selected{% endif %}
+                    >
+                        {{ name }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+            </div>
+
+
+            <!-- YEAR -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Year
+                </label>
+
+                <select
+                    name="year"
+                    class="border border-gray-300 rounded-xl px-4 py-3 bg-white"
+                >
+
+                    {% for year in years %}
+
+                    <option
+                        value="{{ year }}"
+                        {% if year == selected_year %}selected{% endif %}
+                    >
+                        {{ year }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+            </div>
+
+
+            <button
+                type="submit"
+                class="px-5 py-3 bg-gray-900 text-white rounded-xl
+                       font-semibold hover:bg-black transition"
+            >
+                <i class="fa-solid fa-filter mr-2"></i>
+                Apply Filter
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <!-- SUMMARY CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-8">
+
+
+        <!-- BIKES SOLD -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+
+            <div class="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
+                <i class="fa-solid fa-motorcycle text-blue-600"></i>
+            </div>
+
+            <p class="text-sm text-gray-500">
+                Bikes Sold
+            </p>
+
+            <h2 class="text-3xl font-bold text-gray-900 mt-1">
+                {{ summary.bikes_sold or 0 }}
+            </h2>
+
+        </div>
+
+
+        <!-- TOTAL SALES -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+
+            <div class="w-11 h-11 bg-purple-50 rounded-xl flex items-center justify-center mb-4">
+                <i class="fa-solid fa-money-bill-trend-up text-purple-600"></i>
+            </div>
+
+            <p class="text-sm text-gray-500">
+                Total Sales
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-1">
+                Rs. {{ "{:,.2f}".format(summary.total_sales or 0) }}
+            </h2>
+
+        </div>
+
+
+        <!-- PURCHASE COST -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+
+            <div class="w-11 h-11 bg-red-50 rounded-xl flex items-center justify-center mb-4">
+                <i class="fa-solid fa-cart-shopping text-red-600"></i>
+            </div>
+
+            <p class="text-sm text-gray-500">
+                Purchase Cost
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-1">
+                Rs. {{ "{:,.2f}".format(summary.total_purchase_cost or 0) }}
+            </h2>
+
+        </div>
+
+
+        <!-- EXPENSES -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+
+            <div class="w-11 h-11 bg-orange-50 rounded-xl flex items-center justify-center mb-4">
+                <i class="fa-solid fa-receipt text-orange-600"></i>
+            </div>
+
+            <p class="text-sm text-gray-500">
+                Additional Expenses
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-1">
+                Rs. {{ "{:,.2f}".format(summary.total_expenses or 0) }}
+            </h2>
+
+        </div>
+
+
+        <!-- NET PROFIT -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+
+            <div class="w-11 h-11 bg-green-50 rounded-xl flex items-center justify-center mb-4">
+                <i class="fa-solid fa-chart-line text-green-600"></i>
+            </div>
+
+            <p class="text-sm text-gray-500">
+                Net Profit
+            </p>
+
+            {% if (summary.net_profit or 0) >= 0 %}
+
+            <h2 class="text-2xl font-bold text-green-600 mt-1">
+                Rs. {{ "{:,.2f}".format(summary.net_profit or 0) }}
+            </h2>
+
+            {% else %}
+
+            <h2 class="text-2xl font-bold text-red-600 mt-1">
+                Rs. {{ "{:,.2f}".format(summary.net_profit or 0) }}
+            </h2>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- PROFIT FORMULA -->
+    <div class="bg-green-50 border border-green-200 rounded-2xl p-5 mb-8">
+
+        <div class="flex items-center gap-3">
+
+            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-calculator text-green-700"></i>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-green-900">
+                    Profit Calculation
+                </h3>
+
+                <p class="text-sm text-green-800 mt-1">
+                    Net Profit = Sold Price - Purchase Price - Additional Expenses
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SALES HISTORY -->
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+        <div class="px-6 py-5 border-b border-gray-200">
+
+            <h2 class="text-xl font-bold text-gray-900">
+                Sales History
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+                Bikes sold during the selected month.
+            </p>
+
+        </div>
+
+
+        {% if sales %}
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full text-sm">
+
+                <thead class="bg-gray-50 text-gray-600">
+
+                    <tr>
+
+                        <th class="px-5 py-4 text-left">
+                            Bike
+                        </th>
+
+                        <th class="px-5 py-4 text-left">
+                            Purchase Date
+                        </th>
+
+                        <th class="px-5 py-4 text-right">
+                            Purchase Price
+                        </th>
+
+                        <th class="px-5 py-4 text-left">
+                            Sold Date
+                        </th>
+
+                        <th class="px-5 py-4 text-right">
+                            Sold Price
+                        </th>
+
+                        <th class="px-5 py-4 text-right">
+                            Expenses
+                        </th>
+
+                        <th class="px-5 py-4 text-right">
+                            Gross Profit
+                        </th>
+
+                        <th class="px-5 py-4 text-right">
+                            Net Profit
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody class="divide-y divide-gray-100">
+
+                    {% for sale in sales %}
+
+                    <tr class="hover:bg-gray-50">
+
+                        <!-- BIKE -->
+                        <td class="px-5 py-4">
+
+                            <p class="font-semibold text-gray-900">
+                                {{ sale.name }}
+                            </p>
+
+                            <p class="text-xs text-gray-500">
+                                {{ sale.brand }} {{ sale.model }}
+                            </p>
+
+                        </td>
+
+
+                        <!-- PURCHASE DATE -->
+                        <td class="px-5 py-4 text-gray-600">
+
+                            {% if sale.purchase_date %}
+                                {{ sale.purchase_date }}
+                            {% else %}
+                                -
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- PURCHASE PRICE -->
+                        <td class="px-5 py-4 text-right">
+
+                            Rs.
+                            {{ "{:,.2f}".format(sale.purchase_price or 0) }}
+
+                        </td>
+
+
+                        <!-- SOLD DATE -->
+                        <td class="px-5 py-4 text-gray-600">
+
+                            {% if sale.sold_date %}
+                                {{ sale.sold_date }}
+                            {% else %}
+                                -
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- SOLD PRICE -->
+                        <td class="px-5 py-4 text-right font-semibold">
+
+                            Rs.
+                            {{ "{:,.2f}".format(sale.sold_price or 0) }}
+
+                        </td>
+
+
+                        <!-- EXPENSES -->
+                        <td class="px-5 py-4 text-right">
+
+                            Rs.
+                            {{ "{:,.2f}".format(sale.additional_expenses or 0) }}
+
+                        </td>
+
+
+                        <!-- GROSS PROFIT -->
+                        <td class="px-5 py-4 text-right">
+
+                            {% if (sale.gross_profit or 0) >= 0 %}
+
+                            <span class="text-green-600 font-semibold">
+                                Rs.
+                                {{ "{:,.2f}".format(sale.gross_profit or 0) }}
+                            </span>
+
+                            {% else %}
+
+                            <span class="text-red-600 font-semibold">
+                                Rs.
+                                {{ "{:,.2f}".format(sale.gross_profit or 0) }}
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- NET PROFIT -->
+                        <td class="px-5 py-4 text-right">
+
+                            {% if (sale.net_profit or 0) >= 0 %}
+
+                            <span class="inline-flex px-3 py-1 rounded-full bg-green-50 text-green-700 font-bold">
+                                Rs.
+                                {{ "{:,.2f}".format(sale.net_profit or 0) }}
+                            </span>
+
+                            {% else %}
+
+                            <span class="inline-flex px-3 py-1 rounded-full bg-red-50 text-red-700 font-bold">
+                                Rs.
+                                {{ "{:,.2f}".format(sale.net_profit or 0) }}
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% else %}
+
+        <!-- NO SALES -->
+        <div class="py-16 text-center">
+
+            <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full
+                        flex items-center justify-center mb-4">
+
+                <i class="fa-solid fa-chart-line text-gray-400 text-2xl"></i>
+
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-900">
+                No Sales Found
+            </h3>
+
+            <p class="text-gray-500 mt-1">
+                There are no sold bikes for the selected month.
+            </p>
+
+            <a
+                href="{{ url_for('admin.bikes') }}"
+                class="inline-flex items-center gap-2 mt-5 px-5 py-3
+                       bg-gray-900 text-white rounded-xl
+                       font-semibold hover:bg-black transition"
+            >
+                <i class="fa-solid fa-motorcycle"></i>
+                View Bikes
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- MONTHLY TOTAL -->
+    {% if sales %}
+
+    <div class="mt-6 bg-gray-900 text-white rounded-2xl p-6">
+
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+
+            <div>
+
+                <p class="text-gray-400 text-sm">
+                    Monthly Net Profit
+                </p>
+
+                {% if (summary.net_profit or 0) >= 0 %}
+
+                <h2 class="text-3xl font-bold text-green-400 mt-1">
+                    Rs. {{ "{:,.2f}".format(summary.net_profit or 0) }}
+                </h2>
+
+                {% else %}
+
+                <h2 class="text-3xl font-bold text-red-400 mt-1">
+                    Rs. {{ "{:,.2f}".format(summary.net_profit or 0) }}
+                </h2>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+
+                <div>
+                    <p class="text-gray-400 text-sm">
+                        Total Sales
+                    </p>
+
+                    <p class="font-semibold mt-1">
+                        Rs. {{ "{:,.2f}".format(summary.total_sales or 0) }}
+                    </p>
+                </div>
+
+
+                <div>
+                    <p class="text-gray-400 text-sm">
+                        Purchase Cost
+                    </p>
+
+                    <p class="font-semibold mt-1">
+                        Rs. {{ "{:,.2f}".format(summary.total_purchase_cost or 0) }}
+                    </p>
+                </div>
+
+
+                <div>
+                    <p class="text-gray-400 text-sm">
+                        Expenses
+                    </p>
+
+                    <p class="font-semibold mt-1">
+                        Rs. {{ "{:,.2f}".format(summary.total_expenses or 0) }}
+                    </p>
+                </div>
+
+
+                <div>
+                    <p class="text-gray-400 text-sm">
+                        Bikes Sold
+                    </p>
+
+                    <p class="font-semibold mt-1">
+                        {{ summary.bikes_sold or 0 }}
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
