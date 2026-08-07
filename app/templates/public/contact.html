@@ -1,0 +1,27 @@
+{% extends 'base.html' %}{% block title %}Contact — Supa Auto Link{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+    <div class="grid lg:grid-cols-2 gap-12"><div>
+        <p class="text-red-600 text-xs font-bold tracking-[.2em] uppercase">Get in touch</p>
+        <h1 class="font-display text-5xl font-extrabold mt-2">Contact Supa Auto Link</h1>
+        <div class="mt-8 space-y-4"><div class="rounded-2xl bg-gray-50 border border-gray-200 p-5">
+            <p class="text-xs uppercase text-gray-400 font-bold">Phone</p>
+            <a href="tel:{{ settings.phone }}" class="font-display text-2xl font-bold">{{ settings.phone }}</a>
+        </div><div class="rounded-2xl bg-gray-50 border border-gray-200 p-5">
+            <p class="text-xs uppercase text-gray-400 font-bold">Address</p>
+            <p class="font-semibold mt-1">{{ settings.address }}</p></div>{% if settings.opening_hours %}
+            <div class="rounded-2xl bg-gray-50 border border-gray-200 p-5">
+                <p class="text-xs uppercase text-gray-400 font-bold">Opening Hours</p>
+                <p class="whitespace-pre-line mt-1">{{ settings.opening_hours }}</p>
+            </div>{% endif %}</div><div class="w-full overflow-hidden rounded-2xl shadow-sm border border-gray-200">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3531.883894726833!2d85.30602257546785!3d27.72087087617479!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb190005a2b3fb%3A0xedc0694c14839deb!2sSupa%20Auto%20link!5e0!3m2!1sen!2snp!4v1786077644410!5m2!1sen!2snp"
+                  class="w-full h-[420px]"
+                  style="border:0;"
+                  allowfullscreen=""
+                  loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin">
+                </iframe>
+              </div>
+        </div><div class="rounded-2xl border border-gray-200 shadow-sm p-7"><h2 class="font-display text-3xl font-bold">Send an Inquiry</h2><form action="{{ url_for('public.submit_inquiry') }}" method="POST" class="space-y-4 mt-6"><input class="field" name="name" required placeholder="Full name"><input class="field" name="phone" required placeholder="Phone number"><input class="field" name="email" type="email" placeholder="Email (optional)"><select class="field" name="bike_interested"><option value="">General inquiry</option>{% for bike in bikes %}<option>{{ bike.name }}</option>{% endfor %}</select><textarea class="field min-h-36" name="message" required placeholder="How can we help?"></textarea><button class="btn-red w-full py-3">Submit Inquiry</button></form></div></div></section>
+{% endblock %}

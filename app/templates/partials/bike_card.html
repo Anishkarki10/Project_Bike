@@ -1,0 +1,33 @@
+<div class="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow group">
+  <div class="relative bg-gray-100 aspect-[16/10] overflow-hidden">
+    {% set img = bike.cover_image %}
+    {% if img %}
+      <img src="{{ img if img.startswith('http') else url_for('static', filename='uploads/bikes/' ~ img) }}" alt="{{ bike.name }}" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300">
+    {% else %}
+      <div class="w-full h-full flex items-center justify-center text-gray-400">No image</div>
+    {% endif %}
+    <span class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full {{ 'bg-green-100 text-green-800' if bike.status == 'available' else 'bg-gray-900 text-white' }}">{{ '✓ Available' if bike.status == 'available' else bike.status|title }}</span>
+    <span class="absolute top-3 right-3 px-2.5 py-1 text-xs bg-black/65 text-white rounded-full">{{ bike.category|title }}</span>
+  </div>
+  <div class="p-5">
+    <div class="flex justify-between gap-3">
+      <div>
+        <h3 class="font-display text-xl font-bold leading-tight">{{ bike.name }}</h3>
+        <p class="text-xs text-gray-500 mt-1">{{ bike.brand }} • {{ bike.model }}</p>
+      </div>
+      <span class="text-sm text-gray-500">{{ bike.year }}</span>
+    </div>
+    <div class="flex flex-wrap items-center gap-2 mt-4 text-xs text-gray-600">
+      <span>{{ bike.engine_cc }}cc</span><span class="text-gray-300">|</span>
+      <span>{{ '{:,}'.format(bike.km_travelled) }} km</span><span class="text-gray-300">|</span>
+      <span>{{ bike.condition_text or 'Used' }}</span>
+    </div>
+    <div class="flex items-end justify-between gap-4 mt-5">
+      <div>
+        <p class="font-display font-extrabold text-2xl text-red-600">Rs. {{ '{:,.0f}'.format(bike.price) }}</p>
+        {% if bike.original_price %}<p class="text-xs text-gray-400 line-through">Rs. {{ '{:,.0f}'.format(bike.original_price) }}</p>{% endif %}
+      </div>
+      <a href="{{ url_for('public.bike_detail', bike_id=bike.id) }}" class="bg-[#111] hover:bg-red-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold transition-colors">View Details</a>
+    </div>
+  </div>
+</div>

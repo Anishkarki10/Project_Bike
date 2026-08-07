@@ -1,0 +1,36 @@
+<footer class="bg-[#111] text-white mt-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+    <div class="grid md:grid-cols-4 gap-10">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-3">
+          <img src="{{ url_for('static', filename='images/logo.png') }}" class="w-20 h-20 bg-white rounded-xl object-contain" alt="Logo">
+          <div>
+            <p class="font-display font-extrabold text-2xl">SUPA AUTO LINK</p>
+            <p class="text-red-500 font-bold tracking-[0.2em] text-xs">BUY • SELL • EXCHANGE</p>
+          </div>
+        </div>
+        <p class="mt-5 text-sm text-gray-400 max-w-lg leading-relaxed">Quality second-hand motorcycles and scooters in Kathmandu with clear vehicle information and transparent pricing.</p>
+      </div>
+      <div>
+        <p class="font-bold mb-4">Quick Links</p>
+        <div class="space-y-2 text-sm text-gray-400">
+          <a class="block hover:text-white" href="{{ url_for('public.bikes') }}">Available Bikes</a>
+          <a class="block hover:text-white" href="{{ url_for('public.about') }}">About Us</a>
+          <a class="block hover:text-white" href="{{ url_for('public.contact') }}">Contact</a>
+        </div>
+      </div>
+      <div>
+        <p class="font-bold mb-4">Contact</p>
+        <div class="space-y-2 text-sm text-gray-400">
+          <p>{{ settings.address if settings else 'Nayabazar-16, Kathmandu, Nepal' }}</p>
+          <a class="block hover:text-white" href="tel:{{ settings.phone if settings else '9860541990' }}">{{ settings.phone if settings else '9860541990' }}</a>
+          {% if settings and settings.email %}<a class="block hover:text-white" href="mailto:{{ settings.email }}">{{ settings.email }}</a>{% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="mt-10 pt-6 border-t border-white/10 text-xs text-gray-500 flex flex-wrap justify-between gap-3">
+      <p>© 2026 Supa Auto Link. All rights reserved.</p>
+      <a href="{{ url_for('admin.login') }}" class="hover:text-gray-300">Admin</a>
+    </div>
+  </div>
+</footer>

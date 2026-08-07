@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}{{ bike.name }} — Supa Auto Link{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <a href="{{ url_for('public.bikes') }}" class="text-sm font-semibold text-gray-500 hover:text-red-600">← Back to bikes</a>
+  <div class="grid lg:grid-cols-2 gap-10 mt-5">
+    <div>
+      <div class="bg-gray-100 rounded-2xl overflow-hidden aspect-[4/3]">
+        {% if bike.images %}{% set first = bike.images[0] %}<img data-main-bike-image src="{{ first if first.startswith('http') else url_for('static', filename='uploads/bikes/' ~ first) }}" class="w-full h-full object-cover" alt="{{ bike.name }}">{% endif %}
+      </div>
+      {% if bike.images|length > 1 %}<div class="grid grid-cols-4 gap-3 mt-3">{% for image in bike.images %}<button type="button" class="rounded-lg overflow-hidden aspect-[4/3] border border-gray-200" data-bike-thumb="{{ image if image.startswith('http') else url_for('static', filename='uploads/bikes/' ~ image) }}"><img src="{{ image if image.startswith('http') else url_for('static', filename='uploads/bikes/' ~ image) }}" class="w-full h-full object-cover"></button>{% endfor %}</div>{% endif %}
+    </div>
+    <div>
+      <div class="flex items-center gap-2"><span class="px-3 py-1 rounded-full text-xs font-bold {{ 'bg-green-100 text-green-800' if bike.status == 'available' else 'bg-gray-900 text-white' }}">{{ bike.status|title }}</span><span class="text-sm text-gray-500">{{ bike.category|title }}</span></div>
+      <h1 class="font-display text-5xl font-extrabold mt-4">{{ bike.name }}</h1>
+      <p class="text-gray-500 mt-1">{{ bike.brand }} • {{ bike.model }} • {{ bike.year }}</p>
+      <p class="font-display text-4xl text-red-600 font-extrabold mt-6">Rs. {{ '{:,.0f}'.format(bike.price) }}</p>
+      <p class="mt-5 text-gray-600 leading-relaxed">{{ bike.short_description }}</p>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-7">
+        {% for label, value in [('Engine', bike.engine_cc|string ~ 'cc'),('Kilometres','{:,}'.format(bike.km_travelled) ~ ' km'),('Fuel',bike.fuel_type),('Transmission',bike.transmission),('Colour',bike.colour),('Owners',bike.owners)] %}
+        <div class="rounded-xl bg-gray-50 border border-gray-200 p-4"><p class="text-[11px] uppercase font-bold tracking-wide text-gray-400">{{ label }}</p><p class="font-semibold mt-1">{{ value or '—' }}</p></div>
+        {% endfor %}
+      </div>
+      <div class="flex flex-wrap gap-3 mt-7"><a href="tel:{{ settings.phone }}" class="btn-red px-6 py-3">Call Now</a><a href="#inquiry" class="px-6 py-3 rounded-lg border border-gray-300 font-bold hover:border-red-600">Send Inquiry</a></div>
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-[1fr_360px] gap-10 mt-14">
+    <div class="space-y-8">
+      <section><h2 class="font-display text-3xl font-bold">Description</h2><p class="mt-4 text-gray-600 leading-8 whitespace-pre-line">{{ bike.full_description or bike.short_description }}</p></section>
+      {% if bike.feature_list %}<section><h2 class="font-display text-3xl font-bold">Features</h2><div class="grid sm:grid-cols-2 gap-3 mt-4">{% for feature in bike.feature_list %}<div class="rounded-xl border border-gray-200 p-4">✓ {{ feature }}</div>{% endfor %}</div></section>{% endif %}
+      {% for title, value in [('Known Issues',bike.known_issues),('Service Information',bike.service_info),('Documentation',bike.doc_info)] %}{% if value %}<section><h2 class="font-display text-2xl font-bold">{{ title }}</h2><p class="mt-3 text-gray-600 leading-7 whitespace-pre-line">{{ value }}</p></section>{% endif %}{% endfor %}
+    </div>
+    <aside id="inquiry" class="h-fit rounded-2xl border border-gray-200 p-6 shadow-sm sticky top-28">
+      <h3 class="font-display text-2xl font-bold">Interested in this bike?</h3><p class="text-gray-500 text-sm mt-2">Send your details and the showroom can contact you.</p>
+      <form action="{{ url_for('public.submit_inquiry') }}" method="POST" class="space-y-3 mt-5">
+        <input type="hidden" name="bike_id" value="{{ bike.id }}"><input type="hidden" name="bike_interested" value="{{ bike.name }}">
+        <input class="field" name="name" required placeholder="Full name"><input class="field" name="phone" required placeholder="Phone number"><input class="field" name="email" type="email" placeholder="Email (optional)"><textarea class="field min-h-28" name="message" required placeholder="I am interested in {{ bike.name }}..."></textarea><button class="btn-red w-full py-3">Submit Inquiry</button>
+      </form>
+      <a href="tel:{{ settings.phone }}" class="block text-center mt-3 py-3 rounded-lg bg-gray-100 font-bold">Call {{ settings.phone }}</a>
+    </aside>
+  </div>
+</section>
+{% endblock %}
