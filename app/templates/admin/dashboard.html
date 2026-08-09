@@ -1,5 +1,740 @@
-{% extends 'admin/base.html' %}{% block title %}Dashboard — Supa Auto Link{% endblock %}{% block content %}
-<div class="flex flex-wrap justify-between items-end gap-4"><div><h1 class="font-display text-4xl font-extrabold">Dashboard</h1><p class="text-gray-500 mt-1">Welcome back, {{ session.admin_name }}.</p></div><a href="{{ url_for('admin.add_bike') }}" class="btn-red">+ Add New Bike</a></div>
-<div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-7">{% for label,value in [('Total Listings',counts.total),('Available Bikes',counts.available),('Sold Bikes',counts.sold),('New Inquiries',new_inquiries)] %}<div class="bg-white rounded-2xl border border-gray-200 p-5"><p class="text-xs uppercase tracking-wide text-gray-400 font-bold">{{ label }}</p><p class="font-display text-4xl font-extrabold mt-2">{{ value }}</p></div>{% endfor %}</div>
-<div class="grid xl:grid-cols-2 gap-6 mt-7"><div class="bg-white rounded-2xl border border-gray-200"><div class="p-5 border-b border-gray-100 flex justify-between"><h2 class="font-bold">Recently Added Bikes</h2><a class="text-sm text-red-600 font-semibold" href="{{ url_for('admin.bikes') }}">View all</a></div><div class="divide-y">{% for bike in bikes %}<div class="p-4 flex items-center justify-between gap-3"><div><p class="font-semibold">{{ bike.name }}</p><p class="text-xs text-gray-500">{{ bike.brand }} • Rs. {{ '{:,.0f}'.format(bike.price) }}</p></div><span class="text-xs font-bold {{ 'text-green-600' if bike.status=='available' else 'text-gray-500' }}">{{ bike.status|title }}</span></div>{% else %}<p class="p-5 text-gray-500">No bikes yet.</p>{% endfor %}</div></div><div class="bg-white rounded-2xl border border-gray-200"><div class="p-5 border-b border-gray-100 flex justify-between"><h2 class="font-bold">Recent Inquiries</h2><a class="text-sm text-red-600 font-semibold" href="{{ url_for('admin.inquiries') }}">View all</a></div><div class="divide-y">{% for item in inquiries %}<div class="p-4"><div class="flex justify-between"><p class="font-semibold">{{ item.name }}</p><span class="text-xs uppercase font-bold text-gray-400">{{ item.status }}</span></div><p class="text-xs text-gray-500 mt-1">{{ item.phone }} • {{ item.bike_name or item.bike_interested or 'General inquiry' }}</p></div>{% else %}<p class="p-5 text-gray-500">No inquiries yet.</p>{% endfor %}</div></div></div>
+{% extends "admin/base.html" %}
+
+{% block title %}
+Dashboard — Supa Auto Link
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================================================
+     PAGE HEADER
+========================================================= -->
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+
+    <div>
+
+        <h1 class="font-display text-4xl font-extrabold text-gray-900">
+            Dashboard
+        </h1>
+
+        <p class="text-gray-500 mt-1">
+            Welcome back,
+            <span class="font-semibold text-gray-700">
+                {{ session.admin_name }}
+            </span>.
+        </p>
+
+    </div>
+
+
+    <div class="flex flex-wrap gap-3">
+
+        <!-- Sales -->
+        <a
+            href="{{ url_for('admin.sales') }}"
+            class="inline-flex items-center gap-2
+                   px-5 py-3 rounded-xl
+                   border border-gray-300
+                   bg-white text-gray-700
+                   font-semibold
+                   hover:bg-gray-50 transition"
+        >
+            <i class="fa-solid fa-chart-line"></i>
+
+            Sales & Profit
+        </a>
+
+
+        <!-- Add Bike -->
+        <a
+            href="{{ url_for('admin.add_bike') }}"
+            class="btn-red inline-flex items-center gap-2"
+        >
+            <i class="fa-solid fa-plus"></i>
+
+            Add New Bike
+        </a>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     SUMMARY CARDS
+========================================================= -->
+<div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-7">
+
+
+    <!-- TOTAL LISTINGS -->
+    <div
+        class="bg-white rounded-2xl
+               border border-gray-200 p-5"
+    >
+
+        <div class="flex items-center justify-between">
+
+            <div
+                class="w-11 h-11 rounded-xl
+                       bg-blue-50
+                       flex items-center justify-center"
+            >
+                <i class="fa-solid fa-motorcycle text-blue-600"></i>
+            </div>
+
+        </div>
+
+
+        <p
+            class="text-xs uppercase tracking-wide
+                   text-gray-400 font-bold mt-4"
+        >
+            Total Listings
+        </p>
+
+
+        <p
+            class="font-display text-4xl
+                   font-extrabold mt-2"
+        >
+            {{ counts.total or 0 }}
+        </p>
+
+    </div>
+
+
+
+    <!-- AVAILABLE BIKES -->
+    <div
+        class="bg-white rounded-2xl
+               border border-gray-200 p-5"
+    >
+
+        <div class="flex items-center justify-between">
+
+            <div
+                class="w-11 h-11 rounded-xl
+                       bg-green-50
+                       flex items-center justify-center"
+            >
+                <i class="fa-solid fa-circle-check text-green-600"></i>
+            </div>
+
+        </div>
+
+
+        <p
+            class="text-xs uppercase tracking-wide
+                   text-gray-400 font-bold mt-4"
+        >
+            Available Bikes
+        </p>
+
+
+        <p
+            class="font-display text-4xl
+                   font-extrabold mt-2"
+        >
+            {{ counts.available or 0 }}
+        </p>
+
+    </div>
+
+
+
+    <!-- SOLD BIKES -->
+    <div
+        class="bg-white rounded-2xl
+               border border-gray-200 p-5"
+    >
+
+        <div class="flex items-center justify-between">
+
+            <div
+                class="w-11 h-11 rounded-xl
+                       bg-red-50
+                       flex items-center justify-center"
+            >
+                <i class="fa-solid fa-handshake text-red-600"></i>
+            </div>
+
+        </div>
+
+
+        <p
+            class="text-xs uppercase tracking-wide
+                   text-gray-400 font-bold mt-4"
+        >
+            Sold Bikes
+        </p>
+
+
+        <p
+            class="font-display text-4xl
+                   font-extrabold mt-2"
+        >
+            {{ counts.sold or 0 }}
+        </p>
+
+    </div>
+
+
+
+    <!-- NEW INQUIRIES -->
+    <div
+        class="bg-white rounded-2xl
+               border border-gray-200 p-5"
+    >
+
+        <div class="flex items-center justify-between">
+
+            <div
+                class="w-11 h-11 rounded-xl
+                       bg-orange-50
+                       flex items-center justify-center"
+            >
+                <i class="fa-solid fa-envelope text-orange-600"></i>
+            </div>
+
+        </div>
+
+
+        <p
+            class="text-xs uppercase tracking-wide
+                   text-gray-400 font-bold mt-4"
+        >
+            New Inquiries
+        </p>
+
+
+        <p
+            class="font-display text-4xl
+                   font-extrabold mt-2"
+        >
+            {{ new_inquiries or 0 }}
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     QUICK ACTIONS
+========================================================= -->
+<div class="bg-white rounded-2xl border border-gray-200 p-5 mt-7">
+
+    <div class="mb-5">
+
+        <h2 class="text-lg font-bold text-gray-900">
+            Quick Actions
+        </h2>
+
+        <p class="text-sm text-gray-500 mt-1">
+            Manage the most important parts of the system.
+        </p>
+
+    </div>
+
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+
+
+        <!-- Add Bike -->
+        <a
+            href="{{ url_for('admin.add_bike') }}"
+            class="flex items-center gap-3
+                   border border-gray-200 rounded-xl
+                   p-4 hover:bg-gray-50 transition"
+        >
+
+            <div
+                class="w-10 h-10 bg-red-50
+                       rounded-lg flex items-center
+                       justify-center"
+            >
+                <i class="fa-solid fa-plus text-red-600"></i>
+            </div>
+
+
+            <div>
+
+                <p class="font-semibold text-gray-900">
+                    Add Bike
+                </p>
+
+                <p class="text-xs text-gray-500">
+                    Create a listing
+                </p>
+
+            </div>
+
+        </a>
+
+
+
+        <!-- All Bikes -->
+        <a
+            href="{{ url_for('admin.bikes') }}"
+            class="flex items-center gap-3
+                   border border-gray-200 rounded-xl
+                   p-4 hover:bg-gray-50 transition"
+        >
+
+            <div
+                class="w-10 h-10 bg-blue-50
+                       rounded-lg flex items-center
+                       justify-center"
+            >
+                <i class="fa-solid fa-motorcycle text-blue-600"></i>
+            </div>
+
+
+            <div>
+
+                <p class="font-semibold text-gray-900">
+                    All Bikes
+                </p>
+
+                <p class="text-xs text-gray-500">
+                    Manage inventory
+                </p>
+
+            </div>
+
+        </a>
+
+
+
+        <!-- Sales -->
+        <a
+            href="{{ url_for('admin.sales') }}"
+            class="flex items-center gap-3
+                   border border-gray-200 rounded-xl
+                   p-4 hover:bg-gray-50 transition"
+        >
+
+            <div
+                class="w-10 h-10 bg-green-50
+                       rounded-lg flex items-center
+                       justify-center"
+            >
+                <i class="fa-solid fa-chart-line text-green-600"></i>
+            </div>
+
+
+            <div>
+
+                <p class="font-semibold text-gray-900">
+                    Sales & Profit
+                </p>
+
+                <p class="text-xs text-gray-500">
+                    View financial history
+                </p>
+
+            </div>
+
+        </a>
+
+
+
+        <!-- Inquiries -->
+        <a
+            href="{{ url_for('admin.inquiries') }}"
+            class="flex items-center gap-3
+                   border border-gray-200 rounded-xl
+                   p-4 hover:bg-gray-50 transition"
+        >
+
+            <div
+                class="w-10 h-10 bg-orange-50
+                       rounded-lg flex items-center
+                       justify-center"
+            >
+                <i class="fa-solid fa-envelope text-orange-600"></i>
+            </div>
+
+
+            <div>
+
+                <p class="font-semibold text-gray-900">
+                    Inquiries
+                </p>
+
+                <p class="text-xs text-gray-500">
+                    Customer messages
+                </p>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     RECENT DATA
+========================================================= -->
+<div class="grid xl:grid-cols-2 gap-6 mt-7">
+
+
+    <!-- =====================================================
+         RECENT BIKES
+    ====================================================== -->
+    <div
+        class="bg-white rounded-2xl
+               border border-gray-200 overflow-hidden"
+    >
+
+
+        <!-- Header -->
+        <div
+            class="p-5 border-b border-gray-100
+                   flex items-center justify-between"
+        >
+
+            <div>
+
+                <h2 class="font-bold text-gray-900">
+                    Recently Added Bikes
+                </h2>
+
+                <p class="text-xs text-gray-500 mt-1">
+                    Latest vehicle listings.
+                </p>
+
+            </div>
+
+
+            <a
+                class="text-sm text-red-600
+                       font-semibold hover:text-red-700"
+                href="{{ url_for('admin.bikes') }}"
+            >
+                View all
+            </a>
+
+        </div>
+
+
+
+        <!-- Bike List -->
+        <div class="divide-y">
+
+            {% for bike in bikes %}
+
+                <div
+                    class="p-4 flex items-center
+                           justify-between gap-4"
+                >
+
+
+                    <div class="flex items-center gap-3 min-w-0">
+
+
+                        <!-- Image -->
+                        {% if bike.cover_image %}
+
+                            <img
+                                src="{{
+                                    bike.cover_image
+                                    if bike.cover_image.startswith('http')
+                                    else url_for(
+                                        'static',
+                                        filename='uploads/bikes/' ~ bike.cover_image
+                                    )
+                                }}"
+                                alt="{{ bike.name }}"
+                                class="w-14 h-11 rounded-lg
+                                       object-cover flex-shrink-0"
+                            >
+
+                        {% else %}
+
+                            <div
+                                class="w-14 h-11 rounded-lg
+                                       bg-gray-100
+                                       flex items-center justify-center
+                                       flex-shrink-0"
+                            >
+                                <i
+                                    class="fa-solid fa-motorcycle
+                                           text-gray-400"
+                                ></i>
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- Bike Text -->
+                        <div class="min-w-0">
+
+                            <p
+                                class="font-semibold
+                                       text-gray-900 truncate"
+                            >
+                                {{ bike.name }}
+                            </p>
+
+                            <p
+                                class="text-xs text-gray-500 mt-1"
+                            >
+                                {{ bike.brand }}
+                                •
+                                Rs. {{ "{:,.0f}".format(bike.price or 0) }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Status -->
+                    <div>
+
+                        {% if bike.status == "available" %}
+
+                            <span
+                                class="text-xs font-bold
+                                       text-green-600"
+                            >
+                                Available
+                            </span>
+
+                        {% elif bike.status == "sold" %}
+
+                            <span
+                                class="text-xs font-bold
+                                       text-red-600"
+                            >
+                                Sold
+                            </span>
+
+                        {% else %}
+
+                            <span
+                                class="text-xs font-bold
+                                       text-gray-500"
+                            >
+                                {{ bike.status|title }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+            {% else %}
+
+                <div class="p-8 text-center">
+
+                    <i
+                        class="fa-solid fa-motorcycle
+                               text-2xl text-gray-300"
+                    ></i>
+
+                    <p class="text-gray-500 mt-2">
+                        No bikes yet.
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RECENT INQUIRIES
+    ====================================================== -->
+    <div
+        class="bg-white rounded-2xl
+               border border-gray-200 overflow-hidden"
+    >
+
+
+        <!-- Header -->
+        <div
+            class="p-5 border-b border-gray-100
+                   flex items-center justify-between"
+        >
+
+            <div>
+
+                <h2 class="font-bold text-gray-900">
+                    Recent Inquiries
+                </h2>
+
+                <p class="text-xs text-gray-500 mt-1">
+                    Latest customer messages.
+                </p>
+
+            </div>
+
+
+            <a
+                class="text-sm text-red-600
+                       font-semibold hover:text-red-700"
+                href="{{ url_for('admin.inquiries') }}"
+            >
+                View all
+            </a>
+
+        </div>
+
+
+
+        <!-- Inquiry List -->
+        <div class="divide-y">
+
+            {% for item in inquiries %}
+
+                <div class="p-4">
+
+
+                    <div
+                        class="flex items-start
+                               justify-between gap-4"
+                    >
+
+                        <div>
+
+                            <p class="font-semibold text-gray-900">
+                                {{ item.name }}
+                            </p>
+
+                            <p class="text-xs text-gray-500 mt-1">
+
+                                {{ item.phone }}
+
+                                •
+
+                                {{
+                                    item.bike_name
+                                    or item.bike_interested
+                                    or "General inquiry"
+                                }}
+
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- Status -->
+                        {% if item.status == "new" %}
+
+                            <span
+                                class="text-xs uppercase
+                                       font-bold text-red-600
+                                       bg-red-50 px-2 py-1
+                                       rounded-full"
+                            >
+                                New
+                            </span>
+
+
+                        {% elif item.status == "contacted" %}
+
+                            <span
+                                class="text-xs uppercase
+                                       font-bold text-blue-600
+                                       bg-blue-50 px-2 py-1
+                                       rounded-full"
+                            >
+                                Contacted
+                            </span>
+
+
+                        {% else %}
+
+                            <span
+                                class="text-xs uppercase
+                                       font-bold text-gray-500
+                                       bg-gray-100 px-2 py-1
+                                       rounded-full"
+                            >
+                                {{ item.status }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+            {% else %}
+
+                <div class="p-8 text-center">
+
+                    <i
+                        class="fa-solid fa-envelope
+                               text-2xl text-gray-300"
+                    ></i>
+
+                    <p class="text-gray-500 mt-2">
+                        No inquiries yet.
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SECURITY NOTE
+========================================================= -->
+<div
+    class="mt-7 bg-blue-50
+           border border-blue-200
+           rounded-2xl p-5"
+>
+
+    <div class="flex items-start gap-3">
+
+        <div
+            class="w-10 h-10 rounded-xl
+                   bg-blue-100 flex items-center
+                   justify-center flex-shrink-0"
+        >
+            <i class="fa-solid fa-shield-halved text-blue-600"></i>
+        </div>
+
+
+        <div>
+
+            <h3 class="font-semibold text-blue-900">
+                Admin Portal
+            </h3>
+
+            <p class="text-sm text-blue-700 mt-1">
+                Purchase costs, sale prices and profit reports are private administrative information and are not displayed on the public website.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
 {% endblock %}

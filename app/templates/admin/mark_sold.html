@@ -8,7 +8,6 @@ Mark Bike Sold - Supa Auto Link
 
 <div class="max-w-4xl mx-auto p-6">
 
-
     <!-- =====================================================
          PAGE HEADER
     ====================================================== -->
@@ -20,26 +19,19 @@ Mark Bike Sold - Supa Auto Link
                    text-gray-500 hover:text-gray-900 mb-4"
         >
             <i class="fa-solid fa-arrow-left"></i>
-
             Back to Bikes
         </a>
-
 
         <h1 class="text-3xl font-bold text-gray-900">
             Mark Bike as Sold
         </h1>
 
-
         <p class="text-gray-500 mt-2">
-
             Enter the actual sale information.
-
             The system will calculate gross and net profit automatically.
-
         </p>
 
     </div>
-
 
 
     <!-- =====================================================
@@ -51,7 +43,6 @@ Mark Bike Sold - Supa Auto Link
     >
 
         <div class="flex flex-col md:flex-row gap-6">
-
 
             <!-- IMAGE -->
             {% if bike.cover_image %}
@@ -70,16 +61,13 @@ Mark Bike Sold - Supa Auto Link
                            rounded-xl flex items-center
                            justify-center"
                 >
-
                     <i
                         class="fa-solid fa-motorcycle
                                text-4xl text-gray-300"
                     ></i>
-
                 </div>
 
             {% endif %}
-
 
 
             <!-- DETAILS -->
@@ -89,53 +77,41 @@ Mark Bike Sold - Supa Auto Link
                     Bike being sold
                 </p>
 
-
                 <h2 class="text-2xl font-bold text-gray-900 mt-1">
                     {{ bike.name }}
                 </h2>
-
 
                 <p class="text-gray-500 mt-1">
                     {{ bike.brand }} {{ bike.model }}
                 </p>
 
-
                 <div class="flex flex-wrap gap-2 mt-4">
 
-
                     {% if bike.year %}
-
                         <span
                             class="px-3 py-1 bg-gray-100
                                    text-gray-700 rounded-full text-sm"
                         >
                             {{ bike.year }}
                         </span>
-
                     {% endif %}
 
-
                     {% if bike.engine_cc %}
-
                         <span
                             class="px-3 py-1 bg-gray-100
                                    text-gray-700 rounded-full text-sm"
                         >
                             {{ bike.engine_cc }} CC
                         </span>
-
                     {% endif %}
 
-
                     {% if bike.reg_number %}
-
                         <span
                             class="px-3 py-1 bg-gray-100
                                    text-gray-700 rounded-full text-sm"
                         >
                             {{ bike.reg_number }}
                         </span>
-
                     {% endif %}
 
                 </div>
@@ -145,7 +121,6 @@ Mark Bike Sold - Supa Auto Link
         </div>
 
     </div>
-
 
 
     <!-- =====================================================
@@ -159,7 +134,6 @@ Mark Bike Sold - Supa Auto Link
         <div class="flex justify-between gap-4 mb-5">
 
             <div>
-
                 <h2 class="text-xl font-bold text-gray-900">
                     Purchase Information
                 </h2>
@@ -167,7 +141,6 @@ Mark Bike Sold - Supa Auto Link
                 <p class="text-sm text-gray-500 mt-1">
                     Cost information already recorded for this vehicle.
                 </p>
-
             </div>
 
             <span
@@ -183,85 +156,59 @@ Mark Bike Sold - Supa Auto Link
 
         <div class="grid md:grid-cols-2 gap-4">
 
-
             <!-- Purchase Date -->
             <div>
-
                 <p class="text-sm text-gray-500">
                     Purchase Date
                 </p>
 
                 <p class="font-semibold text-gray-900 mt-1">
-
                     {% if bike.purchase_date %}
-
                         {{ bike.purchase_date }}
-
                     {% else %}
-
                         Not recorded
-
                     {% endif %}
-
                 </p>
-
             </div>
 
 
             <!-- Purchase Price -->
             <div>
-
                 <p class="text-sm text-gray-500">
                     Purchase Price
                 </p>
 
                 <p class="font-semibold text-gray-900 mt-1">
-
                     {% if bike.purchase_price %}
-
                         Rs. {{ "{:,.2f}".format(bike.purchase_price) }}
-
                     {% else %}
-
                         Not recorded
-
                     {% endif %}
-
                 </p>
-
             </div>
 
 
             <!-- Asking Price -->
             <div>
-
                 <p class="text-sm text-gray-500">
                     Current Asking Price
                 </p>
 
                 <p class="font-semibold text-gray-900 mt-1">
-
                     Rs. {{ "{:,.2f}".format(bike.price or 0) }}
-
                 </p>
-
             </div>
 
 
             <!-- Current Expenses -->
             <div>
-
                 <p class="text-sm text-gray-500">
                     Existing Expenses
                 </p>
 
                 <p class="font-semibold text-gray-900 mt-1">
-
-                    Rs.
-                    {{ "{:,.2f}".format(bike.additional_expenses or 0) }}
-
+                    Rs. {{ "{:,.2f}".format(bike.additional_expenses or 0) }}
                 </p>
-
             </div>
 
         </div>
@@ -273,23 +220,17 @@ Mark Bike Sold - Supa Auto Link
                 class="mt-5 bg-red-50 border border-red-200
                        rounded-xl p-4"
             >
-
                 <p class="text-sm text-red-700">
-
                     Purchase price has not been recorded.
-
                     Go back to
                     <strong>Edit Bike</strong>
                     and add the purchase information before completing the sale.
-
                 </p>
-
             </div>
 
         {% endif %}
 
     </div>
-
 
 
     <!-- =====================================================
@@ -302,15 +243,19 @@ Mark Bike Sold - Supa Auto Link
                rounded-2xl shadow-sm p-6"
     >
 
+        <!-- CSRF PROTECTION -->
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
 
         <h2 class="text-xl font-bold text-gray-900 mb-6">
             Sale Details
         </h2>
 
 
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
 
             <!-- SOLD DATE -->
             <div>
@@ -320,13 +265,8 @@ Mark Bike Sold - Supa Auto Link
                            text-gray-700 mb-2"
                 >
                     Sold Date
-
-                    <span class="text-red-500">
-                        *
-                    </span>
-
+                    <span class="text-red-500">*</span>
                 </label>
-
 
                 <input
                     type="date"
@@ -342,7 +282,6 @@ Mark Bike Sold - Supa Auto Link
             </div>
 
 
-
             <!-- SOLD PRICE -->
             <div>
 
@@ -351,13 +290,8 @@ Mark Bike Sold - Supa Auto Link
                            text-gray-700 mb-2"
                 >
                     Actual Sold Price
-
-                    <span class="text-red-500">
-                        *
-                    </span>
-
+                    <span class="text-red-500">*</span>
                 </label>
-
 
                 <input
                     type="number"
@@ -379,7 +313,6 @@ Mark Bike Sold - Supa Auto Link
             </div>
 
 
-
             <!-- EXPENSES -->
             <div class="md:col-span-2">
 
@@ -389,7 +322,6 @@ Mark Bike Sold - Supa Auto Link
                 >
                     Total Additional Expenses
                 </label>
-
 
                 <input
                     type="number"
@@ -404,17 +336,13 @@ Mark Bike Sold - Supa Auto Link
                            focus:ring-2 focus:ring-red-500"
                 >
 
-
                 <p class="text-xs text-gray-500 mt-2">
-
                     Total repair, servicing, detailing, transport and other costs associated with this bike.
-
                 </p>
 
             </div>
 
         </div>
-
 
 
         <!-- =================================================
@@ -427,20 +355,16 @@ Mark Bike Sold - Supa Auto Link
 
             <div class="flex items-start gap-3">
 
-
                 <div
                     class="w-10 h-10 bg-green-100
                            rounded-lg flex items-center
                            justify-center"
                 >
-
                     <i
                         class="fa-solid fa-calculator
                                text-green-600"
                     ></i>
-
                 </div>
-
 
                 <div>
 
@@ -448,12 +372,10 @@ Mark Bike Sold - Supa Auto Link
                         Automatic Profit Calculation
                     </h3>
 
-
                     <p class="text-sm text-green-700 mt-1">
                         Gross Profit =
                         Sold Price − Purchase Price
                     </p>
-
 
                     <p class="text-sm text-green-700 mt-1">
                         Net Profit =
@@ -465,7 +387,6 @@ Mark Bike Sold - Supa Auto Link
             </div>
 
         </div>
-
 
 
         <!-- =================================================
@@ -483,17 +404,13 @@ Mark Bike Sold - Supa Auto Link
                            text-yellow-600 mt-1"
                 ></i>
 
-
                 <p class="text-sm text-yellow-800">
-
                     Once confirmed, this bike will be marked as sold and automatically added to Sales History for the selected month.
-
                 </p>
 
             </div>
 
         </div>
-
 
 
         <!-- =================================================
@@ -503,7 +420,6 @@ Mark Bike Sold - Supa Auto Link
             class="flex flex-col sm:flex-row
                    justify-end gap-3 mt-8"
         >
-
 
             <a
                 href="{{ url_for('admin.bikes') }}"
@@ -525,11 +441,8 @@ Mark Bike Sold - Supa Auto Link
                            font-semibold hover:bg-red-700
                            transition"
                 >
-
                     <i class="fa-solid fa-check mr-2"></i>
-
                     Confirm Sale
-
                 </button>
 
             {% else %}
@@ -541,9 +454,7 @@ Mark Bike Sold - Supa Auto Link
                            font-semibold text-center
                            hover:bg-black transition"
                 >
-
                     Add Purchase Information
-
                 </a>
 
             {% endif %}

@@ -1,3 +1,4 @@
+import os
 import pymysql
 import config
 
@@ -8,55 +9,89 @@ class Database:
     # DATABASE CONNECTION
     # =========================================================
     def __init__(self):
+
         self.__connection = pymysql.connect(
             host=config.MYSQL_HOST,
             user=config.MYSQL_USER,
             password=config.MYSQL_PASSWORD,
             database=config.MYSQL_DATABASE,
             cursorclass=pymysql.cursors.DictCursor,
-            autocommit=False,
+            autocommit=False
         )
 
     # =========================================================
-    # FETCH ONE RECORD
+    # FETCH ONE
     # =========================================================
-    def fetch_one(self, query, params=None):
+    def fetch_one(
+        self,
+        query,
+        params=None
+    ):
 
         with self.__connection.cursor() as cursor:
-            cursor.execute(query, params)
+
+            cursor.execute(
+                query,
+                params
+            )
+
             return cursor.fetchone()
 
     # =========================================================
-    # FETCH ALL RECORDS
+    # FETCH ALL
     # =========================================================
-    def fetch_all(self, query, params=None):
+    def fetch_all(
+        self,
+        query,
+        params=None
+    ):
 
         with self.__connection.cursor() as cursor:
-            cursor.execute(query, params)
+
+            cursor.execute(
+                query,
+                params
+            )
+
             return cursor.fetchall()
 
     # =========================================================
-    # EXECUTE INSERT / UPDATE / DELETE / ALTER
+    # EXECUTE
     # =========================================================
-    def execute(self, query, params=None):
+    def execute(
+        self,
+        query,
+        params=None
+    ):
 
-        with self.__connection.cursor() as cursor:
+        try:
 
-            cursor.execute(query, params)
+            with self.__connection.cursor() as cursor:
 
-            self.__connection.commit()
+                cursor.execute(
+                    query,
+                    params
+                )
 
-            return cursor.lastrowid
+                self.__connection.commit()
+
+                return cursor.lastrowid
+
+        except Exception:
+
+            self.__connection.rollback()
+
+            raise
 
     # =========================================================
-    # CLOSE CONNECTION
+    # CLOSE
     # =========================================================
     def close(self):
 
         self.__connection.close()
 
     # =========================================================
-    # CREATE DATABASE IF NOT EXISTS
+    # ENSURE DATABASE
     # =========================================================
     @staticmethod
     def ensure_database():
@@ -65,34 +100,44 @@ class Database:
             host=config.MYSQL_HOST,
             user=config.MYSQL_USER,
             password=config.MYSQL_PASSWORD,
-            cursorclass=pymysql.cursors.DictCursor,
+            cursorclass=pymysql.cursors.DictCursor
         )
 
-        with connection.cursor() as cursor:
+        try:
 
-            cursor.execute(
-                f"""
-                CREATE DATABASE IF NOT EXISTS
-                `{config.MYSQL_DATABASE}`
-                CHARACTER SET utf8mb4
-                COLLATE utf8mb4_unicode_ci
-                """
-            )
+            with connection.cursor() as cursor:
 
-        connection.commit()
+                cursor.execute(
+                    f"""
+                    CREATE DATABASE IF NOT EXISTS
+                    `{config.MYSQL_DATABASE}`
+                    CHARACTER SET utf8mb4
+                    COLLATE utf8mb4_unicode_ci
+                    """
+                )
 
-        connection.close()
+            connection.commit()
+
+        finally:
+
+            connection.close()
 
     # =========================================================
-    # CHECK IF COLUMN EXISTS
+    # CHECK COLUMN
     # =========================================================
     @staticmethod
-    def column_exists(db, table_name, column_name):
+    def column_exists(
+        db,
+        table_name,
+        column_name
+    ):
 
         result = db.fetch_one(
             """
             SELECT COUNT(*) AS total
+
             FROM information_schema.COLUMNS
+
             WHERE TABLE_SCHEMA = %s
             AND TABLE_NAME = %s
             AND COLUMN_NAME = %s
@@ -104,7 +149,9 @@ class Database:
             )
         )
 
-        return result["total"] > 0
+        return (
+            result["total"] > 0
+        )
 
     # =========================================================
     # ADD COLUMN SAFELY
@@ -126,6 +173,7 @@ class Database:
             db.execute(
                 f"""
                 ALTER TABLE `{table_name}`
+
                 ADD COLUMN `{column_name}`
                 {column_definition}
                 """
@@ -137,22 +185,25 @@ class Database:
             )
 
     # =========================================================
-    # CREATE ALL TABLES
+    # CREATE TABLES
     # =========================================================
     @staticmethod
     def create_tables():
 
+        # THIS is where db becomes available
         db = Database()
 
         # =====================================================
-        # USERS TABLE
+        # USERS
         # =====================================================
         db.execute(
             """
             CREATE TABLE IF NOT EXISTS users (
+
                 id INT AUTO_INCREMENT PRIMARY KEY,
 
-                name VARCHAR(100) NOT NULL,
+                name VARCHAR(100)
+                NOT NULL,
 
                 email VARCHAR(150)
                 NOT NULL
@@ -173,7 +224,7 @@ class Database:
         )
 
         # =====================================================
-        # BIKES TABLE
+        # BIKES
         # =====================================================
         db.execute(
             """
@@ -203,15 +254,12 @@ class Database:
                 NOT NULL
                 DEFAULT 0,
 
-                -- Public selling / asking price
                 price DECIMAL(12,2)
                 NOT NULL,
 
-                -- Optional previous listed price
                 original_price DECIMAL(12,2)
                 NULL,
 
-                -- Admin only financial information
                 purchase_price DECIMAL(12,2)
                 NULL,
 
@@ -271,10 +319,8 @@ class Database:
         )
 
         # =====================================================
-        # UPDATE EXISTING BIKES TABLE
+        # EXISTING DB MIGRATIONS
         # =====================================================
-
-        # Add public price if old DB doesn't contain it.
         Database.add_column_if_missing(
             db,
             "bikes",
@@ -282,7 +328,6 @@ class Database:
             "DECIMAL(12,2) NOT NULL DEFAULT 0"
         )
 
-        # Optional original/previous listing price
         Database.add_column_if_missing(
             db,
             "bikes",
@@ -290,7 +335,6 @@ class Database:
             "DECIMAL(12,2) NULL"
         )
 
-        # Purchase price
         Database.add_column_if_missing(
             db,
             "bikes",
@@ -298,7 +342,6 @@ class Database:
             "DECIMAL(12,2) NULL"
         )
 
-        # Purchase date
         Database.add_column_if_missing(
             db,
             "bikes",
@@ -306,7 +349,6 @@ class Database:
             "DATE NULL"
         )
 
-        # Sold price
         Database.add_column_if_missing(
             db,
             "bikes",
@@ -314,7 +356,6 @@ class Database:
             "DECIMAL(12,2) NULL"
         )
 
-        # Sold date
         Database.add_column_if_missing(
             db,
             "bikes",
@@ -322,7 +363,6 @@ class Database:
             "DATE NULL"
         )
 
-        # Repair / servicing / transport / other expenses
         Database.add_column_if_missing(
             db,
             "bikes",
@@ -330,7 +370,6 @@ class Database:
             "DECIMAL(12,2) NOT NULL DEFAULT 0"
         )
 
-        # Date added
         Database.add_column_if_missing(
             db,
             "bikes",
@@ -339,44 +378,52 @@ class Database:
         )
 
         # =====================================================
-        # FORCE CORRECT MONEY FIELD TYPES
+        # CORRECT MONEY TYPES
         # =====================================================
-
         db.execute(
             """
             ALTER TABLE bikes
+
             MODIFY COLUMN price
-            DECIMAL(12,2) NOT NULL
+            DECIMAL(12,2)
+            NOT NULL
             """
         )
 
         db.execute(
             """
             ALTER TABLE bikes
+
             MODIFY COLUMN original_price
-            DECIMAL(12,2) NULL
+            DECIMAL(12,2)
+            NULL
             """
         )
 
         db.execute(
             """
             ALTER TABLE bikes
+
             MODIFY COLUMN purchase_price
-            DECIMAL(12,2) NULL
+            DECIMAL(12,2)
+            NULL
             """
         )
 
         db.execute(
             """
             ALTER TABLE bikes
+
             MODIFY COLUMN sold_price
-            DECIMAL(12,2) NULL
+            DECIMAL(12,2)
+            NULL
             """
         )
 
         db.execute(
             """
             ALTER TABLE bikes
+
             MODIFY COLUMN additional_expenses
             DECIMAL(12,2)
             NOT NULL
@@ -385,7 +432,7 @@ class Database:
         )
 
         # =====================================================
-        # BIKE IMAGES TABLE
+        # BIKE IMAGES
         # =====================================================
         db.execute(
             """
@@ -411,7 +458,7 @@ class Database:
         )
 
         # =====================================================
-        # CUSTOMER INQUIRIES
+        # INQUIRIES
         # =====================================================
         db.execute(
             """
@@ -450,7 +497,7 @@ class Database:
         )
 
         # =====================================================
-        # SETTINGS TABLE
+        # SETTINGS
         # =====================================================
         db.execute(
             """
@@ -468,8 +515,7 @@ class Database:
                 email VARCHAR(150),
 
                 address VARCHAR(255)
-                DEFAULT
-                'Nayabazar-16, Kathmandu, Nepal',
+                DEFAULT 'Nayabazar-16, Kathmandu, Nepal',
 
                 opening_hours TEXT,
 
@@ -489,12 +535,14 @@ class Database:
         )
 
         # =====================================================
-        # CREATE DEFAULT SETTINGS
+        # DEFAULT SETTINGS
         # =====================================================
         settings = db.fetch_one(
             """
             SELECT id
+
             FROM settings
+
             WHERE id = 1
             """
         )
@@ -503,14 +551,17 @@ class Database:
 
             db.execute(
                 """
-                INSERT INTO settings (
+                INSERT INTO settings
+                (
                     id,
                     business_name,
                     phone,
                     address,
                     about_content
                 )
-                VALUES (
+
+                VALUES
+                (
                     1,
                     %s,
                     %s,
@@ -530,24 +581,22 @@ class Database:
                         "Supa Auto Link is a "
                         "second-hand motorcycle "
                         "and scooter showroom in "
-                        "Nayabazar, Kathmandu. "
-                        "We help customers buy, "
-                        "sell and exchange pre-owned "
-                        "two-wheelers with clear "
-                        "vehicle information and "
-                        "transparent pricing."
+                        "Nayabazar, Kathmandu."
                     )
                 )
             )
 
         # =====================================================
-        # CREATE DEFAULT ADMIN
+        # INITIAL ADMIN
         # =====================================================
         admin = db.fetch_one(
             """
             SELECT id
+
             FROM users
+
             WHERE role = 'admin'
+
             LIMIT 1
             """
         )
@@ -558,15 +607,53 @@ class Database:
                 generate_password_hash
             )
 
+            admin_name = os.environ.get(
+                "ADMIN_NAME"
+            )
+
+            admin_email = os.environ.get(
+                "ADMIN_EMAIL"
+            )
+
+            admin_password = os.environ.get(
+                "ADMIN_PASSWORD"
+            )
+
+            if not all([
+                admin_name,
+                admin_email,
+                admin_password
+            ]):
+
+                db.close()
+
+                raise RuntimeError(
+                    "No admin account exists and "
+                    "ADMIN_NAME, ADMIN_EMAIL and "
+                    "ADMIN_PASSWORD are not configured."
+                )
+
+            if len(admin_password) < 12:
+
+                db.close()
+
+                raise RuntimeError(
+                    "ADMIN_PASSWORD must contain "
+                    "at least 12 characters."
+                )
+
             db.execute(
                 """
-                INSERT INTO users (
+                INSERT INTO users
+                (
                     name,
                     email,
                     password,
                     role
                 )
-                VALUES (
+
+                VALUES
+                (
                     %s,
                     %s,
                     %s,
@@ -574,20 +661,25 @@ class Database:
                 )
                 """,
                 (
-                    "Administrator",
+                    admin_name.strip(),
 
-                    "admin@supautolink.com",
+                    admin_email
+                    .strip()
+                    .lower(),
 
                     generate_password_hash(
-                        "admin123"
+                        admin_password
                     )
                 )
             )
 
             print(
-                "Default admin created."
+                "Initial administrator created."
             )
 
+        # =====================================================
+        # CLOSE
+        # =====================================================
         db.close()
 
         print(

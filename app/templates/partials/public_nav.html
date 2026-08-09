@@ -1,34 +1,219 @@
-<header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200 shadow-sm">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-20">
-      <a href="{{ url_for('public.home') }}" class="flex items-center gap-3">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Supa Auto Link" class="w-14 h-14 object-contain">
-        <div class="leading-tight hidden sm:block">
-          <p class="font-display text-xl font-extrabold tracking-wide">SUPA AUTO LINK</p>
-          <p class="text-[10px] tracking-[0.28em] text-gray-500">BUY • SELL • EXCHANGE</p>
+<header
+    class="sticky top-0 z-50 bg-white/95
+           backdrop-blur border-b border-gray-200 shadow-sm"
+>
+
+    {% set phone = settings.phone if settings and settings.phone else '9860541990' %}
+
+
+    <!-- =====================================================
+         DESKTOP / MAIN HEADER
+    ====================================================== -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="flex items-center justify-between h-20">
+
+
+            <!-- =================================================
+                 LOGO
+            ================================================== -->
+            <a
+                href="{{ url_for('public.home') }}"
+                class="flex items-center gap-3"
+                aria-label="Supa Auto Link Home"
+            >
+
+                <img
+                    src="{{ url_for('static', filename='images/logo.png') }}"
+                    alt="Supa Auto Link"
+                    class="w-14 h-14 object-contain"
+                >
+
+
+                <div class="leading-tight hidden sm:block">
+
+                    <p
+                        class="font-display text-xl
+                               font-extrabold tracking-wide"
+                    >
+                        SUPA AUTO LINK
+                    </p>
+
+                    <p
+                        class="text-[10px]
+                               tracking-[0.28em]
+                               text-gray-500"
+                    >
+                        BUY • SELL • EXCHANGE
+                    </p>
+
+                </div>
+
+            </a>
+
+
+
+            <!-- =================================================
+                 DESKTOP NAVIGATION
+            ================================================== -->
+            <nav
+                class="hidden md:flex items-center
+                       gap-1 text-sm font-semibold"
+                aria-label="Main navigation"
+            >
+
+                <a
+                    href="{{ url_for('public.home') }}"
+                    class="nav-link"
+                >
+                    Home
+                </a>
+
+
+                <a
+                    href="{{ url_for('public.bikes') }}"
+                    class="nav-link"
+                >
+                    Available Bikes
+                </a>
+
+
+                <a
+                    href="{{ url_for('public.about') }}"
+                    class="nav-link"
+                >
+                    About Us
+                </a>
+
+
+                <a
+                    href="{{ url_for('public.contact') }}"
+                    class="nav-link"
+                >
+                    Contact
+                </a>
+
+            </nav>
+
+
+
+            <!-- =================================================
+                 DESKTOP ACTIONS
+            ================================================== -->
+            <div
+                class="hidden md:flex
+                       items-center gap-3"
+            >
+
+                <a
+                    href="tel:{{ phone }}"
+                    class="text-sm font-semibold
+                           text-gray-700
+                           hover:text-red-600
+                           transition-colors"
+                    aria-label="Call Supa Auto Link at {{ phone }}"
+                >
+                    ☎ {{ phone }}
+                </a>
+
+
+                <a
+                    href="{{ url_for('public.bikes') }}"
+                    class="btn-red"
+                >
+                    Browse Bikes
+                </a>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 MOBILE MENU BUTTON
+            ================================================== -->
+            <button
+                type="button"
+                data-menu-button
+                class="md:hidden w-10 h-10
+                       rounded-lg border border-gray-200
+                       flex items-center justify-center
+                       hover:bg-gray-50 transition"
+                aria-label="Toggle navigation menu"
+                aria-expanded="false"
+                aria-controls="mobile-navigation"
+            >
+                <span aria-hidden="true">
+                    ☰
+                </span>
+            </button>
+
         </div>
-      </a>
 
-      <nav class="hidden md:flex items-center gap-1 text-sm font-semibold">
-        <a href="{{ url_for('public.home') }}" class="nav-link">Home</a>
-        <a href="{{ url_for('public.bikes') }}" class="nav-link">Available Bikes</a>
-        <a href="{{ url_for('public.about') }}" class="nav-link">About Us</a>
-        <a href="{{ url_for('public.contact') }}" class="nav-link">Contact</a>
-      </nav>
-
-      <div class="hidden md:flex items-center gap-3">
-        <a href="tel:{{ settings.phone if settings else '9860541990' }}" class="text-sm font-semibold text-gray-700 hover:text-red-600">☎ {{ settings.phone if settings else '9860541990' }}</a>
-        <a href="{{ url_for('public.bikes') }}" class="btn-red">Browse Bikes</a>
-      </div>
-
-      <button data-menu-button class="md:hidden w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center" aria-label="Toggle navigation">☰</button>
     </div>
-  </div>
-  <div data-mobile-menu class="hidden md:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-2">
-    <a href="{{ url_for('public.home') }}" class="mobile-link">Home</a>
-    <a href="{{ url_for('public.bikes') }}" class="mobile-link">Available Bikes</a>
-    <a href="{{ url_for('public.about') }}" class="mobile-link">About Us</a>
-    <a href="{{ url_for('public.contact') }}" class="mobile-link">Contact</a>
-    <a href="tel:{{ settings.phone if settings else '9860541990' }}" class="btn-red block text-center mt-3">Call {{ settings.phone if settings else '9860541990' }}</a>
-  </div>
+
+
+
+    <!-- =====================================================
+         MOBILE NAVIGATION
+    ====================================================== -->
+    <div
+        id="mobile-navigation"
+        data-mobile-menu
+        class="hidden md:hidden
+               border-t border-gray-100
+               bg-white px-4 py-4
+               space-y-2"
+    >
+
+        <nav aria-label="Mobile navigation">
+
+            <div class="space-y-2">
+
+                <a
+                    href="{{ url_for('public.home') }}"
+                    class="mobile-link"
+                >
+                    Home
+                </a>
+
+
+                <a
+                    href="{{ url_for('public.bikes') }}"
+                    class="mobile-link"
+                >
+                    Available Bikes
+                </a>
+
+
+                <a
+                    href="{{ url_for('public.about') }}"
+                    class="mobile-link"
+                >
+                    About Us
+                </a>
+
+
+                <a
+                    href="{{ url_for('public.contact') }}"
+                    class="mobile-link"
+                >
+                    Contact
+                </a>
+
+            </div>
+
+        </nav>
+
+
+        <!-- MOBILE CALL BUTTON -->
+        <a
+            href="tel:{{ phone }}"
+            class="btn-red block text-center mt-3"
+            aria-label="Call Supa Auto Link at {{ phone }}"
+        >
+            Call {{ phone }}
+        </a>
+
+    </div>
+
 </header>

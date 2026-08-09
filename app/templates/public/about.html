@@ -1,5 +1,205 @@
-{% extends 'base.html' %}{% block title %}About Us — Supa Auto Link{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}
+About Us — Supa Auto Link
+{% endblock %}
+
 {% block content %}
-<section class="bg-[#111] text-white"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 grid lg:grid-cols-2 gap-10 items-center"><div><p class="text-red-400 text-xs font-bold tracking-[.2em]">ESTD 2023</p><h1 class="font-display text-6xl font-extrabold mt-3">About Supa Auto Link</h1><p class="text-gray-300 leading-8 mt-6">{{ settings.about_content }}</p><div class="mt-7 font-display text-2xl font-bold text-red-500">BUY • SELL • EXCHANGE</div></div><div class="bg-white rounded-3xl p-8"><img src="{{ url_for('static', filename='images/logo.png') }}" class="w-full max-h-[420px] object-contain" alt="Supa Auto Link"></div></div></section>
-<section class="max-w-7xl mx-auto px-4 py-16 grid md:grid-cols-3 gap-6">{% for title,text in [('Clear Information','We present model, year, price, kilometres and condition details clearly.'),('Transparent Pricing','Customers can see the asking price before visiting the showroom.'),('Local Support','Visit us in Nayabazar, Kathmandu for direct discussion and vehicle viewing.')] %}<div class="rounded-2xl border border-gray-200 p-7"><h2 class="font-display text-2xl font-bold">{{ title }}</h2><p class="mt-3 text-gray-600 leading-7">{{ text }}</p></div>{% endfor %}</section>
+
+<!-- =========================================================
+     ABOUT HERO
+========================================================= -->
+<section class="bg-[#111] text-white">
+
+    <div
+        class="max-w-7xl mx-auto
+               px-4 sm:px-6 lg:px-8
+               py-20
+               grid lg:grid-cols-2
+               gap-10 items-center"
+    >
+
+        <!-- =================================================
+             ABOUT CONTENT
+        ================================================== -->
+        <div>
+
+            <p
+                class="text-red-400
+                       text-xs font-bold
+                       tracking-[.2em]"
+            >
+                ESTD 2023
+            </p>
+
+
+            <h1
+                class="font-display
+                       text-5xl sm:text-6xl
+                       font-extrabold mt-3"
+            >
+                About Supa Auto Link
+            </h1>
+
+
+            <p
+                class="text-gray-300
+                       leading-8 mt-6
+                       whitespace-pre-line
+                       break-words"
+            >
+                {% if settings and settings.about_content %}
+
+                    {{ settings.about_content }}
+
+                {% else %}
+
+                    Supa Auto Link is a second-hand motorcycle
+                    and scooter showroom based in Nayabazar,
+                    Kathmandu. We help customers buy, sell and
+                    exchange pre-owned two-wheelers with clear
+                    vehicle information and transparent pricing.
+
+                {% endif %}
+            </p>
+
+
+            <div
+                class="mt-7
+                       font-display
+                       text-2xl font-bold
+                       text-red-500"
+            >
+                BUY • SELL • EXCHANGE
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             LOGO
+        ================================================== -->
+        <div
+            class="bg-white
+                   rounded-3xl
+                   p-8"
+        >
+
+            <img
+                src="{{ url_for('static', filename='images/logo.png') }}"
+                class="w-full
+                       max-h-[420px]
+                       object-contain"
+                alt="Supa Auto Link"
+            >
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     BUSINESS VALUES
+========================================================= -->
+<section
+    class="max-w-7xl mx-auto
+           px-4 sm:px-6 lg:px-8
+           py-16"
+>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+
+        <!-- =================================================
+             CLEAR INFORMATION
+        ================================================== -->
+        <div
+            class="rounded-2xl
+                   border border-gray-200
+                   p-7"
+        >
+
+            <h2
+                class="font-display
+                       text-2xl font-bold"
+            >
+                Clear Information
+            </h2>
+
+
+            <p
+                class="mt-3
+                       text-gray-600
+                       leading-7"
+            >
+                We present model, year, price,
+                kilometres and condition details clearly.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             TRANSPARENT PRICING
+        ================================================== -->
+        <div
+            class="rounded-2xl
+                   border border-gray-200
+                   p-7"
+        >
+
+            <h2
+                class="font-display
+                       text-2xl font-bold"
+            >
+                Transparent Pricing
+            </h2>
+
+
+            <p
+                class="mt-3
+                       text-gray-600
+                       leading-7"
+            >
+                Customers can see the asking price
+                before visiting the showroom.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             LOCAL SUPPORT
+        ================================================== -->
+        <div
+            class="rounded-2xl
+                   border border-gray-200
+                   p-7"
+        >
+
+            <h2
+                class="font-display
+                       text-2xl font-bold"
+            >
+                Local Support
+            </h2>
+
+
+            <p
+                class="mt-3
+                       text-gray-600
+                       leading-7"
+            >
+                Visit us in Nayabazar, Kathmandu
+                for direct discussion and vehicle viewing.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
 {% endblock %}

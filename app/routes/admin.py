@@ -2,10 +2,14 @@ from flask import Blueprint
 
 from app.controllers.admin_controller import AdminController
 from app.auth import admin_required
+from app.extensions import limiter
 
 
 class AdminRoutes:
 
+    # =========================================================
+    # INITIALIZE ADMIN BLUEPRINT
+    # =========================================================
     def __init__(self):
 
         self.bp = Blueprint(
@@ -16,82 +20,136 @@ class AdminRoutes:
 
         self.controller = AdminController()
 
-
+    # =========================================================
+    # REGISTER ROUTES
+    # =========================================================
     def register(self):
 
-        # ==============================
-        # AUTH
-        # ==============================
-
-        self.bp.route(
-            "/login",
-            methods=["GET", "POST"]
+        # =====================================================
+        # LOGIN
+        #
+        # Rate limited to reduce brute-force attempts.
+        # =====================================================
+        login_handler = limiter.limit(
+            "5 per minute; 20 per hour"
         )(
             self.controller.login
         )
 
         self.bp.route(
-            "/logout"
+            "/login",
+            methods=[
+                "GET",
+                "POST"
+            ]
         )(
-            self.controller.logout
+            login_handler
         )
 
 
-        # ==============================
-        # DASHBOARD
-        # ==============================
+        # =====================================================
+        # LOGOUT
+        #
+        # POST only because logout changes session state.
+        # CSRF token must be included in logout form.
+        # =====================================================
+        self.bp.route(
+            "/logout",
+            methods=[
+                "POST"
+            ]
+        )(
+            admin_required(
+                self.controller.logout
+            )
+        )
 
+
+        # =====================================================
+        # DASHBOARD ROOT
+        # =====================================================
         self.bp.add_url_rule(
             "/",
             endpoint="root",
             view_func=admin_required(
                 self.controller.dashboard
-            )
+            ),
+            methods=[
+                "GET"
+            ]
         )
 
+
+        # =====================================================
+        # DASHBOARD
+        # =====================================================
         self.bp.add_url_rule(
             "/dashboard",
             endpoint="dashboard",
             view_func=admin_required(
                 self.controller.dashboard
-            )
+            ),
+            methods=[
+                "GET"
+            ]
         )
 
 
-        # ==============================
-        # BIKES
-        # ==============================
-
+        # =====================================================
+        # ALL BIKES
+        # =====================================================
         self.bp.route(
             "/bikes",
-            methods=["GET"]
+            methods=[
+                "GET"
+            ]
         )(
             admin_required(
                 self.controller.bikes
             )
         )
 
+
+        # =====================================================
+        # ADD BIKE
+        # =====================================================
         self.bp.route(
             "/bikes/add",
-            methods=["GET", "POST"]
+            methods=[
+                "GET",
+                "POST"
+            ]
         )(
             admin_required(
                 self.controller.add_bike
             )
         )
 
+
+        # =====================================================
+        # EDIT BIKE
+        # =====================================================
         self.bp.route(
             "/bikes/<int:bike_id>/edit",
-            methods=["GET", "POST"]
+            methods=[
+                "GET",
+                "POST"
+            ]
         )(
             admin_required(
                 self.controller.edit_bike
             )
         )
 
+
+        # =====================================================
+        # DELETE BIKE
+        # =====================================================
         self.bp.route(
             "/bikes/<int:bike_id>/delete",
-            methods=["POST"]
+            methods=[
+                "POST"
+            ]
         )(
             admin_required(
                 self.controller.delete_bike
@@ -99,13 +157,14 @@ class AdminRoutes:
         )
 
 
-        # ==============================
-        # TOGGLE BIKE
-        # ==============================
-
+        # =====================================================
+        # TOGGLE BIKE STATUS
+        # =====================================================
         self.bp.route(
             "/bikes/<int:bike_id>/toggle",
-            methods=["POST"]
+            methods=[
+                "POST"
+            ]
         )(
             admin_required(
                 self.controller.toggle_bike_status
@@ -113,13 +172,15 @@ class AdminRoutes:
         )
 
 
-        # ==============================
+        # =====================================================
         # MARK BIKE AS SOLD
-        # ==============================
-
+        # =====================================================
         self.bp.route(
             "/bikes/<int:bike_id>/sold",
-            methods=["GET", "POST"],
+            methods=[
+                "GET",
+                "POST"
+            ],
             endpoint="mark_bike_sold"
         )(
             admin_required(
@@ -128,22 +189,29 @@ class AdminRoutes:
         )
 
 
-        # ==============================
-        # INQUIRIES
-        # ==============================
-
+        # =====================================================
+        # CUSTOMER INQUIRIES
+        # =====================================================
         self.bp.route(
             "/inquiries",
-            methods=["GET"]
+            methods=[
+                "GET"
+            ]
         )(
             admin_required(
                 self.controller.inquiries
             )
         )
 
+
+        # =====================================================
+        # UPDATE INQUIRY STATUS
+        # =====================================================
         self.bp.route(
             "/inquiries/<int:inquiry_id>/status",
-            methods=["POST"]
+            methods=[
+                "POST"
+            ]
         )(
             admin_required(
                 self.controller.update_inquiry
@@ -151,13 +219,15 @@ class AdminRoutes:
         )
 
 
-        # ==============================
+        # =====================================================
         # SETTINGS
-        # ==============================
-
+        # =====================================================
         self.bp.route(
             "/settings",
-            methods=["GET", "POST"]
+            methods=[
+                "GET",
+                "POST"
+            ]
         )(
             admin_required(
                 self.controller.settings
@@ -165,13 +235,14 @@ class AdminRoutes:
         )
 
 
-        # ==============================
-        # SALES
-        # ==============================
-
+        # =====================================================
+        # SALES & PROFIT
+        # =====================================================
         self.bp.route(
             "/sales",
-            methods=["GET"],
+            methods=[
+                "GET"
+            ],
             endpoint="sales"
         )(
             admin_required(
@@ -180,13 +251,17 @@ class AdminRoutes:
         )
 
 
-        # ==============================
+        # =====================================================
         # EXPORT SALES CSV
-        # ==============================
-
+        #
+        # GET is acceptable here because exporting does not
+        # modify server-side data.
+        # =====================================================
         self.bp.route(
             "/sales/export",
-            methods=["GET"],
+            methods=[
+                "GET"
+            ],
             endpoint="export_sales_csv"
         )(
             admin_required(
@@ -195,4 +270,7 @@ class AdminRoutes:
         )
 
 
+        # =====================================================
+        # RETURN BLUEPRINT
+        # =====================================================
         return self.bp

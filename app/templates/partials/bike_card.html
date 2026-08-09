@@ -1,33 +1,309 @@
-<div class="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow group">
-  <div class="relative bg-gray-100 aspect-[16/10] overflow-hidden">
-    {% set img = bike.cover_image %}
-    {% if img %}
-      <img src="{{ img if img.startswith('http') else url_for('static', filename='uploads/bikes/' ~ img) }}" alt="{{ bike.name }}" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300">
-    {% else %}
-      <div class="w-full h-full flex items-center justify-center text-gray-400">No image</div>
-    {% endif %}
-    <span class="absolute top-3 left-3 px-3 py-1 text-xs font-bold rounded-full {{ 'bg-green-100 text-green-800' if bike.status == 'available' else 'bg-gray-900 text-white' }}">{{ '✓ Available' if bike.status == 'available' else bike.status|title }}</span>
-    <span class="absolute top-3 right-3 px-2.5 py-1 text-xs bg-black/65 text-white rounded-full">{{ bike.category|title }}</span>
-  </div>
-  <div class="p-5">
-    <div class="flex justify-between gap-3">
-      <div>
-        <h3 class="font-display text-xl font-bold leading-tight">{{ bike.name }}</h3>
-        <p class="text-xs text-gray-500 mt-1">{{ bike.brand }} • {{ bike.model }}</p>
-      </div>
-      <span class="text-sm text-gray-500">{{ bike.year }}</span>
+<div
+    class="bg-white rounded-2xl
+           border border-gray-200
+           overflow-hidden
+           hover:shadow-xl
+           transition-shadow
+           group"
+>
+
+    <!-- =====================================================
+         BIKE IMAGE
+    ====================================================== -->
+    <div
+        class="relative bg-gray-100
+               aspect-[16/10] overflow-hidden"
+    >
+
+        {% set img = bike.cover_image %}
+
+
+        {% if img %}
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename='uploads/bikes/' ~ img
+                ) }}"
+                alt="{{ bike.name or 'Bike' }}"
+                loading="lazy"
+                class="w-full h-full object-cover
+                       group-hover:scale-[1.03]
+                       transition-transform duration-300"
+            >
+
+        {% else %}
+
+            <div
+                class="w-full h-full
+                       flex flex-col
+                       items-center justify-center
+                       text-gray-400"
+            >
+
+                <i
+                    class="fa-solid fa-motorcycle
+                           text-3xl mb-2"
+                ></i>
+
+                <span class="text-sm">
+                    No image available
+                </span>
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             STATUS
+        ================================================== -->
+        {% if bike.status == "available" %}
+
+            <span
+                class="absolute top-3 left-3
+                       px-3 py-1 text-xs font-bold
+                       rounded-full
+                       bg-green-100 text-green-800"
+            >
+                ✓ Available
+            </span>
+
+        {% elif bike.status == "sold" %}
+
+            <span
+                class="absolute top-3 left-3
+                       px-3 py-1 text-xs font-bold
+                       rounded-full
+                       bg-gray-900 text-white"
+            >
+                Sold
+            </span>
+
+        {% elif bike.status == "draft" %}
+
+            <span
+                class="absolute top-3 left-3
+                       px-3 py-1 text-xs font-bold
+                       rounded-full
+                       bg-yellow-100 text-yellow-700"
+            >
+                Draft
+            </span>
+
+        {% else %}
+
+            <span
+                class="absolute top-3 left-3
+                       px-3 py-1 text-xs font-bold
+                       rounded-full
+                       bg-gray-100 text-gray-700"
+            >
+                Unavailable
+            </span>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             CATEGORY
+        ================================================== -->
+        <span
+            class="absolute top-3 right-3
+                   px-2.5 py-1 text-xs
+                   bg-black/65 text-white
+                   rounded-full"
+        >
+            {% if bike.category == "motorcycle" %}
+                Motorcycle
+            {% elif bike.category == "scooter" %}
+                Scooter
+            {% else %}
+                Bike
+            {% endif %}
+        </span>
+
     </div>
-    <div class="flex flex-wrap items-center gap-2 mt-4 text-xs text-gray-600">
-      <span>{{ bike.engine_cc }}cc</span><span class="text-gray-300">|</span>
-      <span>{{ '{:,}'.format(bike.km_travelled) }} km</span><span class="text-gray-300">|</span>
-      <span>{{ bike.condition_text or 'Used' }}</span>
+
+
+    <!-- =====================================================
+         CONTENT
+    ====================================================== -->
+    <div class="p-5">
+
+
+        <!-- =================================================
+             NAME / MODEL / YEAR
+        ================================================== -->
+        <div class="flex justify-between gap-3">
+
+            <div class="min-w-0">
+
+                <h3
+                    class="font-display text-xl
+                           font-bold leading-tight
+                           text-gray-900
+                           break-words"
+                >
+                    {{ bike.name or "Unnamed Bike" }}
+                </h3>
+
+
+                <p
+                    class="text-xs text-gray-500
+                           mt-1 break-words"
+                >
+
+                    {{ bike.brand or "Unknown Brand" }}
+
+                    {% if bike.model %}
+                        • {{ bike.model }}
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            {% if bike.year %}
+
+                <span
+                    class="text-sm text-gray-500
+                           whitespace-nowrap"
+                >
+                    {{ bike.year }}
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =================================================
+             VEHICLE SUMMARY
+        ================================================== -->
+        <div
+            class="flex flex-wrap items-center
+                   gap-2 mt-4 text-xs text-gray-600"
+        >
+
+            {% if bike.engine_cc %}
+
+                <span>
+                    {{ bike.engine_cc }}cc
+                </span>
+
+            {% endif %}
+
+
+            {% if bike.engine_cc and bike.km_travelled is not none %}
+
+                <span class="text-gray-300">
+                    |
+                </span>
+
+            {% endif %}
+
+
+            {% if bike.km_travelled is not none %}
+
+                <span>
+                    {{ "{:,}".format(bike.km_travelled or 0) }} km
+                </span>
+
+            {% endif %}
+
+
+            {% if bike.condition_text %}
+
+                <span class="text-gray-300">
+                    |
+                </span>
+
+                <span class="break-words">
+                    {{ bike.condition_text }}
+                </span>
+
+            {% else %}
+
+                <span class="text-gray-300">
+                    |
+                </span>
+
+                <span>
+                    Used
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =================================================
+             PRICE + BUTTON
+        ================================================== -->
+        <div
+            class="flex items-end justify-between
+                   gap-4 mt-5"
+        >
+
+            <div>
+
+                <!-- CURRENT PRICE -->
+                {% if bike.price %}
+
+                    <p
+                        class="font-display font-extrabold
+                               text-2xl text-red-600"
+                    >
+                        Rs. {{ "{:,.0f}".format(bike.price or 0) }}
+                    </p>
+
+                {% else %}
+
+                    <p
+                        class="font-display font-bold
+                               text-lg text-gray-500"
+                    >
+                        Contact for price
+                    </p>
+
+                {% endif %}
+
+
+                <!-- ORIGINAL PRICE -->
+                {% if bike.original_price %}
+
+                    <p
+                        class="text-xs text-gray-400
+                               line-through"
+                    >
+                        Rs. {{ "{:,.0f}".format(bike.original_price) }}
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- DETAILS BUTTON -->
+            <a
+                href="{{ url_for(
+                    'public.bike_detail',
+                    bike_id=bike.id
+                ) }}"
+                class="bg-[#111] hover:bg-red-600
+                       text-white rounded-lg
+                       px-4 py-2.5
+                       text-sm font-bold
+                       transition-colors
+                       whitespace-nowrap"
+            >
+                View Details
+            </a>
+
+        </div>
+
     </div>
-    <div class="flex items-end justify-between gap-4 mt-5">
-      <div>
-        <p class="font-display font-extrabold text-2xl text-red-600">Rs. {{ '{:,.0f}'.format(bike.price) }}</p>
-        {% if bike.original_price %}<p class="text-xs text-gray-400 line-through">Rs. {{ '{:,.0f}'.format(bike.original_price) }}</p>{% endif %}
-      </div>
-      <a href="{{ url_for('public.bike_detail', bike_id=bike.id) }}" class="bg-[#111] hover:bg-red-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold transition-colors">View Details</a>
-    </div>
-  </div>
+
 </div>

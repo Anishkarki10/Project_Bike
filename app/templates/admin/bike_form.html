@@ -34,11 +34,23 @@
     {% set b = bike or {} %}
 
 
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
     <form
         method="POST"
         enctype="multipart/form-data"
         class="space-y-6 mt-7 max-w-5xl"
     >
+
+        <!-- =================================================
+             CSRF PROTECTION
+        ================================================== -->
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
 
 
         <!-- =================================================
@@ -62,8 +74,10 @@
 
                     <input
                         class="field"
+                        type="text"
                         name="name"
                         required
+                        maxlength="180"
                         value="{{ b.name or '' }}"
                         placeholder="Example: Yamaha MT-15 V2"
                     >
@@ -80,8 +94,10 @@
 
                     <input
                         class="field"
+                        type="text"
                         name="brand"
                         required
+                        maxlength="100"
                         value="{{ b.brand or '' }}"
                         placeholder="Example: Yamaha"
                     >
@@ -98,8 +114,10 @@
 
                     <input
                         class="field"
+                        type="text"
                         name="model"
                         required
+                        maxlength="120"
                         value="{{ b.model or '' }}"
                         placeholder="Example: MT-15 V2"
                     >
@@ -209,6 +227,7 @@
 
                 </div>
 
+
                 <span
                     class="px-3 py-1 rounded-full
                            bg-red-50 text-red-700
@@ -266,7 +285,7 @@
                 </div>
 
 
-                <!-- Current Expenses -->
+                <!-- Additional Expenses -->
                 <div class="md:col-span-2">
 
                     <label class="label">
@@ -336,6 +355,7 @@
                         type="number"
                         name="engine_cc"
                         min="0"
+                        max="5000"
                         value="{{ b.engine_cc or '' }}"
                         placeholder="155"
                     >
@@ -343,7 +363,7 @@
                 </div>
 
 
-                <!-- KM -->
+                <!-- Kilometres -->
                 <div>
 
                     <label class="label">
@@ -371,7 +391,9 @@
 
                     <input
                         class="field"
+                        type="text"
                         name="fuel_type"
+                        maxlength="50"
                         value="{{ b.fuel_type or 'Petrol' }}"
                     >
 
@@ -387,7 +409,9 @@
 
                     <input
                         class="field"
+                        type="text"
                         name="transmission"
+                        maxlength="80"
                         value="{{ b.transmission or '' }}"
                         placeholder="Manual"
                     >
@@ -404,7 +428,9 @@
 
                     <input
                         class="field"
+                        type="text"
                         name="colour"
+                        maxlength="80"
                         value="{{ b.colour or '' }}"
                     >
 
@@ -420,7 +446,9 @@
 
                     <input
                         class="field"
+                        type="text"
                         name="condition_text"
+                        maxlength="80"
                         value="{{ b.condition_text or '' }}"
                         placeholder="Excellent / Good"
                     >
@@ -439,6 +467,7 @@
                         class="field"
                         type="number"
                         min="0"
+                        max="50"
                         name="owners"
                         value="{{ b.owners or 1 }}"
                     >
@@ -455,7 +484,9 @@
 
                     <input
                         class="field"
+                        type="text"
                         name="reg_number"
+                        maxlength="80"
                         value="{{ b.reg_number or '' }}"
                     >
 
@@ -484,7 +515,7 @@
             <div class="grid md:grid-cols-2 gap-4">
 
 
-                <!-- Selling Price -->
+                <!-- Asking Price -->
                 <div>
 
                     <label class="label">
@@ -573,12 +604,13 @@
                     <textarea
                         class="field min-h-24"
                         name="short_description"
+                        maxlength="500"
                     >{{ b.short_description or '' }}</textarea>
 
                 </div>
 
 
-                <!-- Full -->
+                <!-- Full Description -->
                 <div>
 
                     <label class="label">
@@ -602,6 +634,7 @@
 
                     <input
                         class="field"
+                        type="text"
                         name="features"
                         value="{{ b.features or '' }}"
                         placeholder="ABS, LED Headlight, Slipper Clutch"
@@ -617,7 +650,7 @@
                 <div class="grid md:grid-cols-3 gap-4">
 
 
-                    <!-- Issues -->
+                    <!-- Known Issues -->
                     <div>
 
                         <label class="label">
@@ -632,7 +665,7 @@
                     </div>
 
 
-                    <!-- Service -->
+                    <!-- Service Information -->
                     <div>
 
                         <label class="label">
@@ -758,7 +791,7 @@
                         class="file-field"
                         type="file"
                         name="cover_image"
-                        accept="image/*"
+                        accept=".jpg,.jpeg,.png,.webp"
                     >
 
 
@@ -771,7 +804,15 @@
                             </p>
 
                             <img
-                                src="{{ b.cover_image if b.cover_image.startswith('http') else url_for('static', filename='uploads/bikes/' ~ b.cover_image) }}"
+                                src="{{
+                                    b.cover_image
+                                    if b.cover_image.startswith('http')
+                                    else url_for(
+                                        'static',
+                                        filename='uploads/bikes/' ~ b.cover_image
+                                    )
+                                }}"
+                                alt="{{ b.name }}"
                                 class="w-40 h-28 rounded-xl object-cover border"
                             >
 
@@ -793,7 +834,7 @@
                         class="file-field"
                         type="file"
                         name="gallery_images"
-                        accept="image/*"
+                        accept=".jpg,.jpeg,.png,.webp"
                         multiple
                     >
 

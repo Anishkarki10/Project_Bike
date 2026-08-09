@@ -1,62 +1,432 @@
-{% extends 'base.html' %}
-{% block title %}Supa Auto Link — Second-Hand Bikes in Kathmandu{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}
+Supa Auto Link — Second-Hand Bikes in Kathmandu
+{% endblock %}
+
 {% block content %}
+
+<!-- =========================================================
+     HERO SECTION
+========================================================= -->
 <section class="relative overflow-hidden bg-[#111] text-white">
-  <div class="absolute inset-0 bg-[radial-gradient(circle_at_75%_30%,rgba(212,43,43,0.22),transparent_35%)]"></div>
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 grid lg:grid-cols-2 gap-12 items-center">
-    <div>
-      <div class="inline-flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-red-400 uppercase mb-5">Est. 2023 · Kathmandu</div>
-      <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[0.95]">Find Your<br><span class="text-red-500">Next Ride.</span></h1>
-      <p class="mt-6 text-lg text-gray-300 max-w-xl leading-relaxed">Quality second-hand bikes & scooters with transparent pricing, full details and straightforward showroom support.</p>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a href="{{ url_for('public.bikes') }}" class="btn-red text-base px-6 py-3">Browse Available Bikes</a>
-        <a href="{{ url_for('public.contact') }}" class="px-6 py-3 border border-white/20 rounded-lg font-bold hover:bg-white hover:text-black transition">Contact Supa Auto Link</a>
-      </div>
+
+    <div
+        class="absolute inset-0
+               bg-[radial-gradient(circle_at_75%_30%,rgba(212,43,43,0.22),transparent_35%)]"
+    ></div>
+
+    <div
+        class="relative max-w-7xl mx-auto
+               px-4 sm:px-6 lg:px-8
+               py-20 lg:py-28
+               grid lg:grid-cols-2
+               gap-12 items-center"
+    >
+
+        <!-- HERO CONTENT -->
+        <div>
+
+            <div
+                class="inline-flex items-center gap-2
+                       text-xs font-bold
+                       tracking-[0.2em]
+                       text-red-400 uppercase mb-5"
+            >
+                Est. 2023 · Kathmandu
+            </div>
+
+
+            <h1
+                class="font-display
+                       text-5xl sm:text-6xl lg:text-7xl
+                       font-extrabold leading-[0.95]"
+            >
+                Find Your
+                <br>
+
+                <span class="text-red-500">
+                    Next Ride.
+                </span>
+            </h1>
+
+
+            <p
+                class="mt-6 text-lg
+                       text-gray-300
+                       max-w-xl leading-relaxed"
+            >
+                Quality second-hand bikes & scooters with
+                transparent pricing, full details and
+                straightforward showroom support.
+            </p>
+
+
+            <div class="mt-8 flex flex-wrap gap-3">
+
+                <a
+                    href="{{ url_for('public.bikes') }}"
+                    class="btn-red text-base px-6 py-3"
+                >
+                    Browse Available Bikes
+                </a>
+
+
+                <a
+                    href="{{ url_for('public.contact') }}"
+                    class="px-6 py-3
+                           border border-white/20
+                           rounded-lg font-bold
+                           hover:bg-white hover:text-black
+                           transition"
+                >
+                    Contact Supa Auto Link
+                </a>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             HERO BIKE
+        ================================================== -->
+        <div class="relative">
+
+            <div
+                class="absolute -inset-10
+                       bg-red-600/10
+                       rounded-full blur-3xl"
+            ></div>
+
+
+            {% if bikes %}
+
+                {% set hero = bikes[0] %}
+
+                {% if hero.cover_image %}
+
+                    <img
+                        class="relative rounded-3xl
+                               w-full aspect-[4/3]
+                               object-cover shadow-2xl"
+
+                        src="{{
+                            hero.cover_image
+                            if hero.cover_image.startswith('http')
+                            else url_for(
+                                'static',
+                                filename='uploads/bikes/' ~ hero.cover_image
+                            )
+                        }}"
+
+                        alt="{{ hero.name }}"
+                        width="800"
+                        height="600"
+                        fetchpriority="high"
+                    >
+
+                {% else %}
+
+                    <div
+                        class="relative rounded-3xl
+                               aspect-[4/3]
+                               bg-gradient-to-br
+                               from-gray-800 to-black
+                               border border-white/10
+                               flex items-center justify-center
+                               text-gray-500"
+                    >
+                        Bike image unavailable
+                    </div>
+
+                {% endif %}
+
+
+            {% else %}
+
+                <div
+                    class="relative rounded-3xl
+                           aspect-[4/3]
+                           bg-gradient-to-br
+                           from-gray-800 to-black
+                           border border-white/10
+                           flex items-center justify-center
+                           text-gray-500"
+                >
+                    No bikes currently available
+                </div>
+
+            {% endif %}
+
+        </div>
+
     </div>
-    <div class="relative">
-      <div class="absolute -inset-10 bg-red-600/10 rounded-full blur-3xl"></div>
-      {% if bikes %}
-        {% set hero = bikes[0] %}
-        {% if hero.cover_image %}<img class="relative rounded-3xl w-full aspect-[4/3] object-cover shadow-2xl" src="{{ hero.cover_image if hero.cover_image.startswith('http') else url_for('static', filename='uploads/bikes/' ~ hero.cover_image) }}" alt="{{ hero.name }}">{% endif %}
-      {% else %}
-        <div class="relative rounded-3xl aspect-[4/3] bg-gradient-to-br from-gray-800 to-black border border-white/10 flex items-center justify-center text-gray-500">Add your first bike from Admin</div>
-      {% endif %}
-    </div>
-  </div>
+
 </section>
 
+
+
+<!-- =========================================================
+     BUSINESS FEATURES
+========================================================= -->
 <section class="border-b border-gray-200 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-4 py-5 grid grid-cols-2 md:grid-cols-5 gap-4 text-center text-xs sm:text-sm font-bold tracking-wide">
-    <span>BUY</span><span>SELL</span><span>EXCHANGE</span><span>TRANSPARENT PRICING</span><span>KATHMANDU</span>
-  </div>
-</section>
 
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-  <div class="flex items-end justify-between gap-4 mb-8">
-    <div><p class="text-red-600 text-xs font-bold tracking-[.2em] uppercase">Latest stock</p><h2 class="font-display text-4xl font-extrabold mt-1">Available Bikes</h2></div>
-    <a href="{{ url_for('public.bikes') }}" class="font-bold text-sm hover:text-red-600">View all bikes →</a>
-  </div>
-  {% if bikes %}<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">{% for bike in bikes %}{% include 'partials/bike_card.html' %}{% endfor %}</div>{% else %}<div class="rounded-2xl bg-gray-50 border border-gray-200 p-12 text-center text-gray-500">No available bikes yet.</div>{% endif %}
-</section>
+    <div
+        class="max-w-7xl mx-auto
+               px-4 py-5
+               grid grid-cols-2 md:grid-cols-5
+               gap-4 text-center
+               text-xs sm:text-sm
+               font-bold tracking-wide"
+    >
 
-<section class="bg-gray-50 border-y border-gray-200">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="grid lg:grid-cols-3 gap-6">
-      {% for title, text in [('BUY','Browse quality pre-owned motorcycles and scooters currently available at our showroom.'),('SELL','Want to sell your existing bike? Contact us and share the vehicle details.'),('EXCHANGE','Ask about exchanging your current two-wheeler for another available vehicle.')] %}
-      <div class="bg-white rounded-2xl border border-gray-200 p-7"><span class="text-red-600 font-display text-4xl font-extrabold">{{ title }}</span><p class="text-gray-600 mt-4 leading-relaxed">{{ text }}</p></div>
-      {% endfor %}
+        <span>BUY</span>
+
+        <span>SELL</span>
+
+        <span>EXCHANGE</span>
+
+        <span>TRANSPARENT PRICING</span>
+
+        <span>KATHMANDU</span>
+
     </div>
-  </div>
+
 </section>
 
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid lg:grid-cols-2 gap-10 items-center">
-  <div>
-    <p class="text-red-600 text-xs font-bold tracking-[.2em] uppercase">Why Supa Auto Link</p>
-    <h2 class="font-display text-4xl font-extrabold mt-2">Simple, clear and local.</h2>
-    <p class="mt-5 text-gray-600 leading-relaxed">{{ settings.about_content if settings else '' }}</p>
-  </div>
-  <div class="grid sm:grid-cols-2 gap-4">
-    {% for item in ['Quality Second-Hand Vehicles','Clear Vehicle Information','Transparent Pricing','Buy, Sell & Exchange'] %}<div class="rounded-xl border border-gray-200 p-5 font-bold">✓ {{ item }}</div>{% endfor %}
-  </div>
+
+
+<!-- =========================================================
+     AVAILABLE BIKES
+========================================================= -->
+<section
+    class="max-w-7xl mx-auto
+           px-4 sm:px-6 lg:px-8 py-16"
+>
+
+    <div
+        class="flex items-end
+               justify-between gap-4 mb-8"
+    >
+
+        <div>
+
+            <p
+                class="text-red-600 text-xs
+                       font-bold tracking-[.2em]
+                       uppercase"
+            >
+                Latest Stock
+            </p>
+
+
+            <h2
+                class="font-display text-4xl
+                       font-extrabold mt-1"
+            >
+                Available Bikes
+            </h2>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('public.bikes') }}"
+            class="font-bold text-sm
+                   hover:text-red-600"
+        >
+            View all bikes →
+        </a>
+
+    </div>
+
+
+
+    {% if bikes %}
+
+        <div
+            class="grid md:grid-cols-2
+                   lg:grid-cols-3 gap-6"
+        >
+
+            {% for bike in bikes %}
+
+                {% include "partials/bike_card.html" %}
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <div
+            class="rounded-2xl bg-gray-50
+                   border border-gray-200
+                   p-12 text-center
+                   text-gray-500"
+        >
+            No available bikes yet.
+        </div>
+
+    {% endif %}
+
 </section>
+
+
+
+<!-- =========================================================
+     BUY / SELL / EXCHANGE
+========================================================= -->
+<section
+    class="bg-gray-50
+           border-y border-gray-200"
+>
+
+    <div
+        class="max-w-7xl mx-auto
+               px-4 sm:px-6 lg:px-8 py-16"
+    >
+
+        <div class="grid lg:grid-cols-3 gap-6">
+
+            {% for title, text in [
+
+                (
+                    'BUY',
+                    'Browse quality pre-owned motorcycles and scooters currently available at our showroom.'
+                ),
+
+                (
+                    'SELL',
+                    'Want to sell your existing bike? Contact us and share the vehicle details.'
+                ),
+
+                (
+                    'EXCHANGE',
+                    'Ask about exchanging your current two-wheeler for another available vehicle.'
+                )
+
+            ] %}
+
+                <div
+                    class="bg-white rounded-2xl
+                           border border-gray-200 p-7"
+                >
+
+                    <span
+                        class="text-red-600
+                               font-display text-4xl
+                               font-extrabold"
+                    >
+                        {{ title }}
+                    </span>
+
+
+                    <p
+                        class="text-gray-600
+                               mt-4 leading-relaxed"
+                    >
+                        {{ text }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     WHY SUPA AUTO LINK
+========================================================= -->
+<section
+    class="max-w-7xl mx-auto
+           px-4 sm:px-6 lg:px-8
+           py-16
+           grid lg:grid-cols-2
+           gap-10 items-center"
+>
+
+    <div>
+
+        <p
+            class="text-red-600 text-xs
+                   font-bold tracking-[.2em]
+                   uppercase"
+        >
+            Why Supa Auto Link
+        </p>
+
+
+        <h2
+            class="font-display text-4xl
+                   font-extrabold mt-2"
+        >
+            Simple, clear and local.
+        </h2>
+
+
+        {% if settings and settings.about_content %}
+
+            <p
+                class="mt-5 text-gray-600
+                       leading-relaxed
+                       whitespace-pre-line"
+            >
+                {{ settings.about_content }}
+            </p>
+
+        {% else %}
+
+            <p
+                class="mt-5 text-gray-600
+                       leading-relaxed"
+            >
+                Supa Auto Link provides quality second-hand
+                motorcycles and scooters with clear vehicle
+                information and transparent pricing.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+
+    <div class="grid sm:grid-cols-2 gap-4">
+
+        {% for item in [
+
+            'Quality Second-Hand Vehicles',
+
+            'Clear Vehicle Information',
+
+            'Transparent Pricing',
+
+            'Buy, Sell & Exchange'
+
+        ] %}
+
+            <div
+                class="rounded-xl
+                       border border-gray-200
+                       p-5 font-bold"
+            >
+                ✓ {{ item }}
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
 {% endblock %}

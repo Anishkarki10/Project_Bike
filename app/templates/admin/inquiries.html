@@ -1,4 +1,331 @@
-{% extends 'admin/base.html' %}{% block title %}Inquiries — Admin{% endblock %}{% block content %}
-<div><h1 class="font-display text-4xl font-extrabold">Customer Inquiries</h1><p class="text-gray-500 mt-1">Messages submitted from the public website.</p></div>
-<div class="grid gap-4 mt-6">{% for item in inquiries %}<article class="bg-white rounded-2xl border border-gray-200 p-5"><div class="flex flex-wrap justify-between gap-3"><div><div class="flex items-center gap-2"><h2 class="font-bold text-lg">{{ item.name }}</h2><span class="status-pill {% if item.status=='new' %}bg-red-50 text-red-700{% elif item.status=='contacted' %}bg-amber-50 text-amber-700{% else %}bg-green-50 text-green-700{% endif %}">{{ item.status|title }}</span></div><p class="text-sm text-gray-500 mt-1">{{ item.phone }}{% if item.email %} • {{ item.email }}{% endif %}</p><p class="text-sm font-semibold mt-2">Interested in: {{ item.bike_name or item.bike_interested or 'General inquiry' }}</p></div><div class="text-xs text-gray-400">{{ item.created_at.strftime('%Y-%m-%d %H:%M') if item.created_at else '' }}</div></div><p class="mt-4 rounded-xl bg-gray-50 p-4 text-sm text-gray-700 leading-6">{{ item.message }}</p><div class="flex flex-wrap gap-2 mt-4"><a href="tel:{{ item.phone }}" class="mini-btn bg-red-600 text-white border-red-600">Call Customer</a>{% for s in ['new','contacted','closed'] %}<form method="POST" action="{{ url_for('admin.update_inquiry',inquiry_id=item.id) }}"><input type="hidden" name="status" value="{{ s }}"><button class="mini-btn {% if item.status==s %}bg-gray-900 text-white{% endif %}">{{ s|title }}</button></form>{% endfor %}</div></article>{% else %}<div class="bg-white border border-gray-200 rounded-2xl p-12 text-center text-gray-500">No inquiries yet.</div>{% endfor %}</div>
+{% extends "admin/base.html" %}
+
+{% block title %}
+Inquiries — Admin
+{% endblock %}
+
+{% block content %}
+
+<div>
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+    <div>
+
+        <h1 class="font-display text-4xl font-extrabold">
+            Customer Inquiries
+        </h1>
+
+        <p class="text-gray-500 mt-1">
+            Messages submitted from the public website.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         INQUIRY LIST
+    ====================================================== -->
+    <div class="grid gap-4 mt-6">
+
+        {% for item in inquiries %}
+
+            <article
+                class="bg-white rounded-2xl
+                       border border-gray-200 p-5"
+            >
+
+                <!-- =========================================
+                     TOP SECTION
+                ========================================== -->
+                <div class="flex flex-wrap justify-between gap-3">
+
+                    <div>
+
+                        <div class="flex items-center gap-2">
+
+                            <h2 class="font-bold text-lg break-words">
+                                {{ item.name or "Unknown Customer" }}
+                            </h2>
+
+
+                            {% if item.status == "new" %}
+
+                                <span
+                                    class="status-pill
+                                           bg-red-50 text-red-700"
+                                >
+                                    New
+                                </span>
+
+                            {% elif item.status == "contacted" %}
+
+                                <span
+                                    class="status-pill
+                                           bg-amber-50 text-amber-700"
+                                >
+                                    Contacted
+                                </span>
+
+                            {% elif item.status == "closed" %}
+
+                                <span
+                                    class="status-pill
+                                           bg-green-50 text-green-700"
+                                >
+                                    Closed
+                                </span>
+
+                            {% else %}
+
+                                <span
+                                    class="status-pill
+                                           bg-gray-100 text-gray-700"
+                                >
+                                    Unknown
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- =================================
+                             CONTACT DETAILS
+                        ================================== -->
+                        <div class="text-sm text-gray-500 mt-1 space-y-1">
+
+                            {% if item.phone %}
+
+                                <p class="break-all">
+                                    {{ item.phone }}
+                                </p>
+
+                            {% else %}
+
+                                <p>
+                                    No phone number provided
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if item.email %}
+
+                                <p class="break-all">
+                                    {{ item.email }}
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- =================================
+                             INTERESTED BIKE
+                        ================================== -->
+                        <p class="text-sm font-semibold mt-2 break-words">
+
+                            Interested in:
+
+                            {{
+                                item.bike_name
+                                or item.bike_interested
+                                or "General inquiry"
+                            }}
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- =====================================
+                         DATE
+                    ====================================== -->
+                    <div class="text-xs text-gray-400">
+
+                        {% if item.created_at %}
+
+                            {{ item.created_at.strftime("%Y-%m-%d %H:%M") }}
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     MESSAGE
+                ========================================== -->
+                <div class="mt-4">
+
+                    <p
+                        class="text-xs uppercase
+                               tracking-wide font-bold
+                               text-gray-400 mb-2"
+                    >
+                        Message
+                    </p>
+
+                    <p
+                        class="rounded-xl bg-gray-50 p-4
+                               text-sm text-gray-700
+                               leading-6
+                               whitespace-pre-wrap
+                               break-words"
+                    >
+                        {{ item.message or "No message provided." }}
+                    </p>
+
+                </div>
+
+
+                <!-- =========================================
+                     ACTIONS
+                ========================================== -->
+                <div class="flex flex-wrap gap-2 mt-4">
+
+
+                    <!-- =====================================
+                         CALL CUSTOMER
+                    ====================================== -->
+                    {% if item.phone %}
+
+                        <a
+                            href="tel:{{ item.phone|urlencode }}"
+                            class="mini-btn
+                                   bg-red-600 text-white
+                                   border-red-600"
+                        >
+                            <i class="fa-solid fa-phone mr-1"></i>
+                            Call Customer
+                        </a>
+
+                    {% endif %}
+
+
+                    <!-- =====================================
+                         EMAIL CUSTOMER
+                    ====================================== -->
+                    {% if item.email %}
+
+                        <a
+                            href="mailto:{{ item.email|urlencode }}"
+                            class="mini-btn"
+                        >
+                            <i class="fa-solid fa-envelope mr-1"></i>
+                            Email
+                        </a>
+
+                    {% endif %}
+
+
+                    <!-- =====================================
+                         STATUS BUTTONS
+                    ====================================== -->
+                    {% for status_value in [
+                        "new",
+                        "contacted",
+                        "closed"
+                    ] %}
+
+                        <form
+                            method="POST"
+                            action="{{
+                                url_for(
+                                    'admin.update_inquiry',
+                                    inquiry_id=item.id
+                                )
+                            }}"
+                        >
+
+                            <!-- CSRF -->
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
+
+
+                            <!-- STATUS -->
+                            <input
+                                type="hidden"
+                                name="status"
+                                value="{{ status_value }}"
+                            >
+
+
+                            <button
+                                type="submit"
+                                class="
+                                    mini-btn
+
+                                    {% if item.status == status_value %}
+                                        bg-gray-900 text-white
+                                    {% endif %}
+                                "
+                            >
+                                {{ status_value|title }}
+                            </button>
+
+                        </form>
+
+                    {% endfor %}
+
+                </div>
+
+            </article>
+
+
+        {% else %}
+
+            <!-- =============================================
+                 EMPTY STATE
+            ============================================== -->
+            <div
+                class="bg-white border border-gray-200
+                       rounded-2xl p-12 text-center"
+            >
+
+                <div
+                    class="w-16 h-16 mx-auto
+                           bg-gray-100 rounded-full
+                           flex items-center justify-center"
+                >
+
+                    <i
+                        class="fa-solid fa-envelope
+                               text-gray-400 text-2xl"
+                    ></i>
+
+                </div>
+
+
+                <h2
+                    class="font-bold text-lg
+                           text-gray-900 mt-4"
+                >
+                    No inquiries yet
+                </h2>
+
+
+                <p class="text-gray-500 text-sm mt-1">
+                    Customer messages submitted from the public
+                    website will appear here.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
 {% endblock %}

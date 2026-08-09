@@ -1,25 +1,311 @@
-{% extends 'base.html' %}
-{% block title %}Available Bikes — Supa Auto Link{% endblock %}
-{% block content %}
-<section class="bg-gray-50 border-b border-gray-200">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <p class="text-red-600 text-xs font-bold tracking-[.2em] uppercase">Current inventory</p>
-    <h1 class="font-display text-5xl font-extrabold mt-2">Available Bikes</h1>
-    <p class="text-gray-600 mt-3">Search second-hand motorcycles and scooters by brand, category and price.</p>
-  </div>
-</section>
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-  <form class="grid md:grid-cols-2 lg:grid-cols-6 gap-3 p-4 rounded-2xl border border-gray-200 bg-white shadow-sm mb-8" method="GET">
-    <input name="search" value="{{ filters.search or '' }}" placeholder="Search bike or brand" class="field lg:col-span-2">
-    <select name="brand" class="field"><option value="">All brands</option>{% for brand in brands %}<option value="{{ brand }}" {% if filters.brand == brand %}selected{% endif %}>{{ brand }}</option>{% endfor %}</select>
-    <select name="category" class="field"><option value="">All types</option><option value="motorcycle" {% if filters.category == 'motorcycle' %}selected{% endif %}>Motorcycle</option><option value="scooter" {% if filters.category == 'scooter' %}selected{% endif %}>Scooter</option></select>
-    <input name="min_price" value="{{ filters.min_price or '' }}" type="number" placeholder="Min price" class="field">
-    <input name="max_price" value="{{ filters.max_price or '' }}" type="number" placeholder="Max price" class="field">
-    <input type="hidden" name="status" value="available">
-    <button class="btn-red lg:col-span-1">Apply Filters</button>
-    <a href="{{ url_for('public.bikes') }}" class="px-4 py-2.5 rounded-lg border border-gray-200 text-center font-semibold text-sm">Reset</a>
-  </form>
+{% extends "base.html" %}
 
-  {% if bikes %}<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">{% for bike in bikes %}{% include 'partials/bike_card.html' %}{% endfor %}</div>{% else %}<div class="rounded-2xl border border-gray-200 p-16 text-center"><p class="font-bold text-xl">No bikes matched your filters.</p><a href="{{ url_for('public.bikes') }}" class="text-red-600 font-semibold mt-2 inline-block">Clear filters</a></div>{% endif %}
+{% block title %}
+Available Bikes — Supa Auto Link
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================================================
+     PAGE HEADER
+========================================================= -->
+<section class="bg-gray-50 border-b border-gray-200">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <p
+            class="text-red-600 text-xs font-bold
+                   tracking-[.2em] uppercase"
+        >
+            Current Inventory
+        </p>
+
+        <h1
+            class="font-display text-5xl
+                   font-extrabold mt-2"
+        >
+            Available Bikes
+        </h1>
+
+        <p class="text-gray-600 mt-3">
+            Search second-hand motorcycles and scooters
+            by brand, category and price.
+        </p>
+
+    </div>
+
 </section>
+
+
+<!-- =========================================================
+     INVENTORY
+========================================================= -->
+<section
+    class="max-w-7xl mx-auto
+           px-4 sm:px-6 lg:px-8 py-10"
+>
+
+    <!-- =====================================================
+         FILTER FORM
+    ====================================================== -->
+    <form
+        action="{{ url_for('public.bikes') }}"
+        method="GET"
+        class="grid md:grid-cols-2 lg:grid-cols-6
+               gap-3 p-4 rounded-2xl
+               border border-gray-200
+               bg-white shadow-sm mb-8"
+    >
+
+        <!-- SEARCH -->
+        <div class="lg:col-span-2">
+
+            <label
+                for="bike-search"
+                class="sr-only"
+            >
+                Search bike or brand
+            </label>
+
+            <input
+                id="bike-search"
+                name="search"
+                type="search"
+                maxlength="100"
+                value="{{ filters.search or '' }}"
+                placeholder="Search bike or brand"
+                class="field w-full"
+            >
+
+        </div>
+
+
+        <!-- BRAND -->
+        <div>
+
+            <label
+                for="brand-filter"
+                class="sr-only"
+            >
+                Brand
+            </label>
+
+            <select
+                id="brand-filter"
+                name="brand"
+                class="field w-full"
+            >
+
+                <option value="">
+                    All brands
+                </option>
+
+                {% for brand in brands %}
+
+                    <option
+                        value="{{ brand }}"
+                        {% if filters.brand == brand %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ brand }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- CATEGORY -->
+        <div>
+
+            <label
+                for="category-filter"
+                class="sr-only"
+            >
+                Category
+            </label>
+
+            <select
+                id="category-filter"
+                name="category"
+                class="field w-full"
+            >
+
+                <option value="">
+                    All types
+                </option>
+
+                <option
+                    value="motorcycle"
+                    {% if filters.category == "motorcycle" %}
+                        selected
+                    {% endif %}
+                >
+                    Motorcycle
+                </option>
+
+                <option
+                    value="scooter"
+                    {% if filters.category == "scooter" %}
+                        selected
+                    {% endif %}
+                >
+                    Scooter
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- MIN PRICE -->
+        <div>
+
+            <label
+                for="min-price"
+                class="sr-only"
+            >
+                Minimum price
+            </label>
+
+            <input
+                id="min-price"
+                name="min_price"
+                type="number"
+                min="0"
+                step="1"
+                value="{{ filters.min_price or '' }}"
+                placeholder="Min price"
+                class="field w-full"
+            >
+
+        </div>
+
+
+        <!-- MAX PRICE -->
+        <div>
+
+            <label
+                for="max-price"
+                class="sr-only"
+            >
+                Maximum price
+            </label>
+
+            <input
+                id="max-price"
+                name="max_price"
+                type="number"
+                min="0"
+                step="1"
+                value="{{ filters.max_price or '' }}"
+                placeholder="Max price"
+                class="field w-full"
+            >
+
+        </div>
+
+
+        <!-- FORCE AVAILABLE STATUS -->
+        <input
+            type="hidden"
+            name="status"
+            value="available"
+        >
+
+
+        <!-- APPLY FILTERS -->
+        <button
+            type="submit"
+            class="btn-red lg:col-span-1"
+        >
+            Apply Filters
+        </button>
+
+
+        <!-- RESET -->
+        <a
+            href="{{ url_for('public.bikes') }}"
+            class="px-4 py-2.5 rounded-lg
+                   border border-gray-200
+                   text-center font-semibold
+                   text-sm hover:bg-gray-50"
+        >
+            Reset
+        </a>
+
+    </form>
+
+
+    <!-- =====================================================
+         BIKE RESULTS
+    ====================================================== -->
+    {% if bikes %}
+
+        <div
+            class="grid md:grid-cols-2
+                   lg:grid-cols-3 gap-6"
+        >
+
+            {% for bike in bikes %}
+
+                {% include "partials/bike_card.html" %}
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <!-- EMPTY STATE -->
+        <div
+            class="rounded-2xl border
+                   border-gray-200 p-16
+                   text-center"
+        >
+
+            <div
+                class="w-16 h-16 mx-auto
+                       bg-gray-100 rounded-full
+                       flex items-center justify-center"
+            >
+                <i
+                    class="fa-solid fa-motorcycle
+                           text-2xl text-gray-400"
+                ></i>
+            </div>
+
+
+            <p
+                class="font-bold text-xl
+                       text-gray-900 mt-4"
+            >
+                No bikes matched your filters.
+            </p>
+
+
+            <p class="text-gray-500 text-sm mt-2">
+                Try changing the brand, category or price range.
+            </p>
+
+
+            <a
+                href="{{ url_for('public.bikes') }}"
+                class="text-red-600 font-semibold
+                       mt-3 inline-block
+                       hover:text-red-700"
+            >
+                Clear filters
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
 {% endblock %}

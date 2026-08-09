@@ -1,1 +1,180 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.tailwindcss.com"></script></head><body class="min-h-screen flex items-center justify-center bg-gray-50"><div class="text-center"><p class="text-red-600 font-bold">404</p><h1 class="text-4xl font-bold mt-2">Page not found</h1><a href="/" class="inline-block mt-6 px-5 py-3 bg-black text-white rounded-lg">Go Home</a></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="robots"
+        content="noindex, nofollow"
+    >
+
+    <title>
+        Page Not Found — Supa Auto Link
+    </title>
+
+
+    <!-- FAVICON -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="{{ url_for('static', filename='images/logo.png') }}"
+    >
+
+
+    <!-- GOOGLE FONTS -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- TAILWIND -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+    <!-- CUSTOM CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/site.css') }}"
+    >
+
+</head>
+
+
+<body
+    class="min-h-screen
+           flex items-center justify-center
+           bg-gray-50 text-gray-900
+           px-4"
+>
+
+
+    <main
+        class="w-full max-w-xl
+               text-center"
+    >
+
+
+        <!-- LOGO -->
+        <a
+            href="{{ url_for('public.home') }}"
+            class="inline-block"
+            aria-label="Go to Supa Auto Link home page"
+        >
+
+            <img
+                src="{{ url_for('static', filename='images/logo.png') }}"
+                alt="Supa Auto Link"
+                class="w-24 h-24
+                       mx-auto object-contain"
+            >
+
+        </a>
+
+
+
+        <!-- ERROR CODE -->
+        <p
+            class="text-red-600
+                   font-bold
+                   tracking-[0.2em]
+                   text-sm mt-6"
+        >
+            ERROR 404
+        </p>
+
+
+
+        <!-- TITLE -->
+        <h1
+            class="font-display
+                   text-4xl sm:text-5xl
+                   font-extrabold mt-2"
+        >
+            Page Not Found
+        </h1>
+
+
+
+        <!-- MESSAGE -->
+        <p
+            class="text-gray-500
+                   mt-4 leading-relaxed
+                   max-w-md mx-auto"
+        >
+            The page you're looking for doesn't exist,
+            may have been moved, or the address may be incorrect.
+        </p>
+
+
+
+        <!-- ACTIONS -->
+        <div
+            class="flex flex-col sm:flex-row
+                   justify-center gap-3 mt-8"
+        >
+
+            <a
+                href="{{ url_for('public.home') }}"
+                class="px-6 py-3
+                       bg-red-600 text-white
+                       rounded-lg font-bold
+                       hover:bg-red-700
+                       transition"
+            >
+                Go Home
+            </a>
+
+
+            <a
+                href="{{ url_for('public.bikes') }}"
+                class="px-6 py-3
+                       bg-white
+                       border border-gray-300
+                       rounded-lg font-bold
+                       hover:bg-gray-100
+                       transition"
+            >
+                Browse Bikes
+            </a>
+
+        </div>
+
+
+        <!-- BACK -->
+        <button
+            type="button"
+            onclick="history.back()"
+            class="mt-6
+                   text-sm text-gray-500
+                   hover:text-red-600
+                   font-semibold"
+        >
+            ← Go Back
+        </button>
+
+
+    </main>
+
+
+</body>
+
+</html>
