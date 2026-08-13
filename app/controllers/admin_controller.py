@@ -32,6 +32,7 @@ class AdminController:
     # INITIALIZE MODELS
     # =========================================================
     def __init__(self):
+
         self.user_model = User()
         self.bike_model = Bike()
         self.inquiry_model = Inquiry()
@@ -43,24 +44,34 @@ class AdminController:
     def login(self):
 
         if session.get("admin_id"):
+
             return redirect(
-                url_for("admin.dashboard")
+                url_for(
+                    "admin.dashboard"
+                )
             )
 
         if request.method == "POST":
 
-            email = request.form.get(
-                "email",
-                ""
-            ).strip().lower()
+            email = (
+                request.form.get(
+                    "email",
+                    ""
+                )
+                .strip()
+                .lower()
+            )
 
             password = request.form.get(
                 "password",
                 ""
             )
 
-            user = self.user_model.find_by_email(
-                email
+            user = (
+                self.user_model
+                .find_by_email(
+                    email
+                )
             )
 
             if (
@@ -83,12 +94,24 @@ class AdminController:
 
             session.clear()
 
-            session["admin_id"] = user["id"]
-            session["admin_name"] = user["name"]
-            session["role"] = user["role"]
+            session.permanent = True
+
+            session["admin_id"] = (
+                user["id"]
+            )
+
+            session["admin_name"] = (
+                user["name"]
+            )
+
+            session["role"] = (
+                user["role"]
+            )
 
             return redirect(
-                url_for("admin.dashboard")
+                url_for(
+                    "admin.dashboard"
+                )
             )
 
         return render_template(
@@ -108,7 +131,9 @@ class AdminController:
         )
 
         return redirect(
-            url_for("admin.login")
+            url_for(
+                "admin.login"
+            )
         )
 
     # =========================================================
@@ -119,9 +144,15 @@ class AdminController:
         return render_template(
             "admin/dashboard.html",
 
-            counts=self.bike_model.counts(),
+            counts=(
+                self.bike_model
+                .counts()
+            ),
 
-            bikes=self.bike_model.get_all()[:5],
+            bikes=(
+                self.bike_model
+                .get_all()[:5]
+            ),
 
             inquiries=(
                 self.inquiry_model
@@ -129,7 +160,8 @@ class AdminController:
             ),
 
             new_inquiries=(
-                self.inquiry_model.count_new()
+                self.inquiry_model
+                .count_new()
             )
         )
 
@@ -138,20 +170,29 @@ class AdminController:
     # =========================================================
     def bikes(self):
 
-        bikes = self.bike_model.get_all(
-            status=(
-                request.args.get("status")
-                or None
-            ),
+        bikes = (
+            self.bike_model
+            .get_all(
+                status=(
+                    request.args.get(
+                        "status"
+                    )
+                    or None
+                ),
 
-            brand=(
-                request.args.get("brand")
-                or None
-            ),
+                brand=(
+                    request.args.get(
+                        "brand"
+                    )
+                    or None
+                ),
 
-            search=(
-                request.args.get("search")
-                or None
+                search=(
+                    request.args.get(
+                        "search"
+                    )
+                    or None
+                )
             )
         )
 
@@ -161,32 +202,42 @@ class AdminController:
             bikes=bikes,
 
             brands=(
-                self.bike_model.get_brands()
+                self.bike_model
+                .get_brands()
             ),
 
             new_inquiries=(
-                self.inquiry_model.count_new()
+                self.inquiry_model
+                .count_new()
             )
         )
 
     # =========================================================
     # IMAGE VALIDATION
     # =========================================================
-    def _allowed_image(self, filename):
+    def _allowed_image(
+        self,
+        filename
+    ):
 
         return (
             "." in filename
-            and filename.rsplit(
+            and filename
+            .rsplit(
                 ".",
                 1
-            )[1].lower()
+            )[1]
+            .lower()
             in config.ALLOWED_IMAGE_EXTENSIONS
         )
 
     # =========================================================
     # SAVE IMAGE
     # =========================================================
-    def _save_file(self, file_obj):
+    def _save_file(
+        self,
+        file_obj
+    ):
 
         if (
             not file_obj
@@ -195,10 +246,13 @@ class AdminController:
                 file_obj.filename
             )
         ):
+
             return None
 
-        filename = secure_filename(
-            file_obj.filename
+        filename = (
+            secure_filename(
+                file_obj.filename
+            )
         )
 
         filename = (
@@ -231,18 +285,32 @@ class AdminController:
     # =========================================================
     # CONVERT INTEGER
     # =========================================================
-    def _int_or(self, value, default=0):
+    def _int_or(
+        self,
+        value,
+        default=0
+    ):
 
         try:
-            return int(value)
 
-        except (TypeError, ValueError):
+            return int(
+                value
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
             return default
 
     # =========================================================
     # CONVERT FLOAT
     # =========================================================
-    def _float_or_none(self, value):
+    def _float_or_none(
+        self,
+        value
+    ):
 
         try:
 
@@ -250,22 +318,34 @@ class AdminController:
                 None,
                 ""
             ):
+
                 return None
 
-            return float(value)
+            return float(
+                value
+            )
 
-        except (TypeError, ValueError):
+        except (
+            TypeError,
+            ValueError
+        ):
+
             return None
 
     # =========================================================
     # NORMALIZE DATE
     # =========================================================
-    def _date_or_none(self, value):
+    def _date_or_none(
+        self,
+        value
+    ):
 
         if not value:
+
             return None
 
         try:
+
             return datetime.strptime(
                 value,
                 "%Y-%m-%d"
@@ -275,6 +355,7 @@ class AdminController:
             TypeError,
             ValueError
         ):
+
             return None
 
     # =========================================================
@@ -295,11 +376,6 @@ class AdminController:
             or old_cover
         )
 
-        # -----------------------------------------------------
-        # Keep existing sale data when editing a sold bike.
-        # Sale information should normally be changed through
-        # the sales system rather than the normal edit form.
-        # -----------------------------------------------------
         existing_bike = (
             existing_bike
             or {}
@@ -352,7 +428,6 @@ class AdminController:
                     )
                 ),
 
-            # Public asking price
             "price":
                 self._float_or_none(
                     request.form.get(
@@ -367,9 +442,6 @@ class AdminController:
                     )
                 ),
 
-            # -------------------------------------------------
-            # PURCHASE INFORMATION
-            # -------------------------------------------------
             "purchase_price":
                 self._float_or_none(
                     request.form.get(
@@ -384,9 +456,6 @@ class AdminController:
                     )
                 ),
 
-            # -------------------------------------------------
-            # EXPENSES
-            # -------------------------------------------------
             "additional_expenses":
                 self._float_or_none(
                     request.form.get(
@@ -394,9 +463,6 @@ class AdminController:
                     )
                 ) or 0,
 
-            # -------------------------------------------------
-            # BIKE DETAILS
-            # -------------------------------------------------
             "fuel_type":
                 request.form.get(
                     "fuel_type",
@@ -485,12 +551,6 @@ class AdminController:
                 )
                 or date.today(),
 
-            # -------------------------------------------------
-            # STATUS
-            # -------------------------------------------------
-            # Do NOT allow normal form editing to create
-            # a fake sale without sale information.
-            # -------------------------------------------------
             "status":
                 existing_bike.get(
                     "status",
@@ -519,8 +579,9 @@ class AdminController:
 
             data = self._form_data()
 
-            # New bikes start available.
-            data["status"] = "available"
+            data["status"] = (
+                "available"
+            )
 
             if (
                 not data["name"]
@@ -548,7 +609,6 @@ class AdminController:
                     )
                 )
 
-            # Purchase price cannot be negative.
             if (
                 data["purchase_price"]
                 is not None
@@ -563,8 +623,11 @@ class AdminController:
 
                 return render_template(
                     "admin/bike_form.html",
+
                     bike=data,
+
                     mode="add",
+
                     new_inquiries=(
                         self.inquiry_model
                         .count_new()
@@ -572,13 +635,15 @@ class AdminController:
                 )
 
             bike_id = (
-                self.bike_model.save(
+                self.bike_model
+                .save(
                     data
                 )
             )
 
             gallery_files = (
-                request.files.getlist(
+                request.files
+                .getlist(
                     "gallery_images"
                 )
             )
@@ -637,7 +702,8 @@ class AdminController:
     ):
 
         bike = (
-            self.bike_model.find_by_id(
+            self.bike_model
+            .find_by_id(
                 bike_id
             )
         )
@@ -705,7 +771,8 @@ class AdminController:
             )
 
             new_gallery = (
-                request.files.getlist(
+                request.files
+                .getlist(
                     "gallery_images"
                 )
             )
@@ -713,6 +780,7 @@ class AdminController:
             if any(
                 file_obj
                 and file_obj.filename
+
                 for file_obj
                 in new_gallery
             ):
@@ -754,7 +822,8 @@ class AdminController:
             )
 
         bike["images"] = (
-            self.bike_model.get_images(
+            self.bike_model
+            .get_images(
                 bike_id
             )
         )
@@ -781,7 +850,8 @@ class AdminController:
     ):
 
         bike = (
-            self.bike_model.find_by_id(
+            self.bike_model
+            .find_by_id(
                 bike_id
             )
         )
@@ -799,11 +869,12 @@ class AdminController:
                 )
             )
 
-        # -----------------------------------------------------
-        # Protect financial history.
-        # Sold bikes should normally remain in the database.
-        # -----------------------------------------------------
-        if bike.get("status") == "sold":
+        if (
+            bike.get(
+                "status"
+            )
+            == "sold"
+        ):
 
             flash(
                 "Sold bikes cannot be deleted "
@@ -842,7 +913,8 @@ class AdminController:
     ):
 
         bike = (
-            self.bike_model.find_by_id(
+            self.bike_model
+            .find_by_id(
                 bike_id
             )
         )
@@ -860,12 +932,12 @@ class AdminController:
                 )
             )
 
-        # -----------------------------------------------------
-        # AVAILABLE -> MARK SOLD FORM
-        # -----------------------------------------------------
-        if bike.get(
-            "status"
-        ) == "available":
+        if (
+            bike.get(
+                "status"
+            )
+            == "available"
+        ):
 
             return redirect(
                 url_for(
@@ -874,12 +946,12 @@ class AdminController:
                 )
             )
 
-        # -----------------------------------------------------
-        # SOLD -> AVAILABLE
-        # -----------------------------------------------------
-        if bike.get(
-            "status"
-        ) == "sold":
+        if (
+            bike.get(
+                "status"
+            )
+            == "sold"
+        ):
 
             self.bike_model.mark_as_available(
                 bike_id
@@ -919,7 +991,8 @@ class AdminController:
     ):
 
         bike = (
-            self.bike_model.find_by_id(
+            self.bike_model
+            .find_by_id(
                 bike_id
             )
         )
@@ -937,11 +1010,10 @@ class AdminController:
                 )
             )
 
-        # -----------------------------------------------------
-        # Don't sell same bike twice.
-        # -----------------------------------------------------
         if (
-            bike.get("status")
+            bike.get(
+                "status"
+            )
             == "sold"
             and request.method
             == "GET"
@@ -1001,11 +1073,9 @@ class AdminController:
             )
 
             if additional_expenses is None:
+
                 additional_expenses = 0
 
-            # -------------------------------------------------
-            # VALIDATION
-            # -------------------------------------------------
             if (
                 sold_price is None
                 or sold_price <= 0
@@ -1051,8 +1121,6 @@ class AdminController:
                     )
                 )
 
-            # Use existing purchase price
-            # when form doesn't provide one.
             if purchase_price is None:
 
                 purchase_price = (
@@ -1069,8 +1137,6 @@ class AdminController:
                     )
                 )
 
-            # Purchase price is required for
-            # meaningful profit calculation.
             if (
                 purchase_price is None
                 or float(
@@ -1144,38 +1210,24 @@ class AdminController:
                     )
                 )
 
-            # -------------------------------------------------
-            # RECORD SALE
-            # -------------------------------------------------
             self.bike_model.mark_as_sold(
-                bike_id=(
-                    bike_id
-                ),
-
-                sold_price=(
-                    sold_price
-                ),
-
-                sold_date=(
-                    sold_date
-                ),
-
-                purchase_price=(
-                    purchase_price
-                ),
-
-                purchase_date=(
-                    purchase_date
-                ),
-
+                bike_id=bike_id,
+                sold_price=sold_price,
+                sold_date=sold_date,
+                purchase_price=purchase_price,
+                purchase_date=purchase_date,
                 additional_expenses=(
                     additional_expenses
                 )
             )
 
             net_profit = (
-                float(sold_price)
-                - float(purchase_price)
+                float(
+                    sold_price
+                )
+                - float(
+                    purchase_price
+                )
                 - float(
                     additional_expenses
                 )
@@ -1194,8 +1246,12 @@ class AdminController:
             return redirect(
                 url_for(
                     "admin.sales",
-                    month=sold_date.month,
-                    year=sold_date.year
+                    month=(
+                        sold_date.month
+                    ),
+                    year=(
+                        sold_date.year
+                    )
                 )
             )
 
@@ -1250,8 +1306,21 @@ class AdminController:
             "closed"
         }
 
-        if status not in allowed_statuses:
-            status = "new"
+        if (
+            status
+            not in allowed_statuses
+        ):
+
+            flash(
+                "Invalid inquiry status.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "admin.inquiries"
+                )
+            )
 
         self.inquiry_model.update_status(
             inquiry_id,
@@ -1275,7 +1344,9 @@ class AdminController:
     def settings(self):
 
         settings = (
-            self.settings_model.get()
+            self.settings_model
+            .get()
+            or {}
         )
 
         if request.method == "POST":
@@ -1284,27 +1355,252 @@ class AdminController:
                 settings
             )
 
-            fields = [
-                "business_name",
-                "phone",
-                "email",
-                "address",
-                "opening_hours",
-                "tiktok",
-                "facebook",
-                "instagram",
-                "about_content"
-            ]
+            # =================================================
+            # BUSINESS NAME
+            # =================================================
+            business_name = (
+                request.form.get(
+                    "business_name",
+                    ""
+                )
+                .strip()
+            )
 
-            for key in fields:
+            if not business_name:
 
-                data[key] = (
-                    request.form.get(
-                        key,
-                        ""
-                    ).strip()
+                flash(
+                    "Business name is required.",
+                    "danger"
                 )
 
+                return render_template(
+                    "admin/settings.html",
+
+                    settings=data,
+
+                    new_inquiries=(
+                        self.inquiry_model
+                        .count_new()
+                    )
+                )
+
+            if len(
+                business_name
+            ) > 120:
+
+                flash(
+                    "Business name cannot exceed "
+                    "120 characters.",
+                    "danger"
+                )
+
+                return render_template(
+                    "admin/settings.html",
+
+                    settings=data,
+
+                    new_inquiries=(
+                        self.inquiry_model
+                        .count_new()
+                    )
+                )
+
+            # =================================================
+            # PHONE
+            # =================================================
+            phone = (
+                request.form.get(
+                    "phone",
+                    ""
+                )
+                .strip()
+            )
+
+            if len(
+                phone
+            ) > 40:
+
+                flash(
+                    "Phone number is too long.",
+                    "danger"
+                )
+
+                return render_template(
+                    "admin/settings.html",
+
+                    settings=data,
+
+                    new_inquiries=(
+                        self.inquiry_model
+                        .count_new()
+                    )
+                )
+
+            # =================================================
+            # EMAIL
+            # =================================================
+            email = (
+                request.form.get(
+                    "email",
+                    ""
+                )
+                .strip()
+                .lower()
+            )
+
+            if len(
+                email
+            ) > 150:
+
+                flash(
+                    "Email address is too long.",
+                    "danger"
+                )
+
+                return render_template(
+                    "admin/settings.html",
+
+                    settings=data,
+
+                    new_inquiries=(
+                        self.inquiry_model
+                        .count_new()
+                    )
+                )
+
+            # =================================================
+            # ADDRESS
+            # =================================================
+            address = (
+                request.form.get(
+                    "address",
+                    ""
+                )
+                .strip()
+            )
+
+            if len(
+                address
+            ) > 255:
+
+                flash(
+                    "Address cannot exceed "
+                    "255 characters.",
+                    "danger"
+                )
+
+                return render_template(
+                    "admin/settings.html",
+
+                    settings=data,
+
+                    new_inquiries=(
+                        self.inquiry_model
+                        .count_new()
+                    )
+                )
+
+            # =================================================
+            # OPENING HOURS
+            # =================================================
+            opening_hours = (
+                request.form.get(
+                    "opening_hours",
+                    ""
+                )
+                .strip()
+            )
+
+            if len(
+                opening_hours
+            ) > 500:
+
+                flash(
+                    "Opening hours cannot exceed "
+                    "500 characters.",
+                    "danger"
+                )
+
+                return render_template(
+                    "admin/settings.html",
+
+                    settings=data,
+
+                    new_inquiries=(
+                        self.inquiry_model
+                        .count_new()
+                    )
+                )
+
+            # =================================================
+            # ABOUT CONTENT
+            # =================================================
+            about_content = (
+                request.form.get(
+                    "about_content",
+                    ""
+                )
+                .strip()
+            )
+
+            if len(
+                about_content
+            ) > 5000:
+
+                flash(
+                    "About content cannot exceed "
+                    "5000 characters.",
+                    "danger"
+                )
+
+                return render_template(
+                    "admin/settings.html",
+
+                    settings=data,
+
+                    new_inquiries=(
+                        self.inquiry_model
+                        .count_new()
+                    )
+                )
+
+            # =================================================
+            # UPDATE CLEAN DATA
+            # =================================================
+            data.update({
+
+                "business_name":
+                    business_name,
+
+                "phone":
+                    phone,
+
+                "email":
+                    email or None,
+
+                "address":
+                    address,
+
+                "opening_hours":
+                    opening_hours,
+
+                "about_content":
+                    about_content,
+
+                # No social media handles currently
+                "tiktok":
+                    None,
+
+                "facebook":
+                    None,
+
+                "instagram":
+                    None
+            })
+
+            # =================================================
+            # LOGO
+            # =================================================
             logo = (
                 request.files.get(
                     "logo"
@@ -1314,9 +1610,6 @@ class AdminController:
             if (
                 logo
                 and logo.filename
-                and self._allowed_image(
-                    logo.filename
-                )
             ):
 
                 filename = (
@@ -1325,13 +1618,32 @@ class AdminController:
                     )
                 )
 
-                if filename:
+                if not filename:
 
-                    data["logo"] = (
-                        "uploads/bikes/"
-                        + filename
+                    flash(
+                        "Invalid logo image.",
+                        "danger"
                     )
 
+                    return render_template(
+                        "admin/settings.html",
+
+                        settings=data,
+
+                        new_inquiries=(
+                            self.inquiry_model
+                            .count_new()
+                        )
+                    )
+
+                data["logo"] = (
+                    "uploads/bikes/"
+                    + filename
+                )
+
+            # =================================================
+            # SAVE
+            # =================================================
             self.settings_model.update(
                 data
             )
@@ -1363,12 +1675,16 @@ class AdminController:
     # =========================================================
     def sales(self):
 
-        today = datetime.now()
+        today = (
+            datetime.now()
+        )
 
         selected_month = (
             request.args.get(
                 "month",
-                default=today.month,
+                default=(
+                    today.month
+                ),
                 type=int
             )
         )
@@ -1376,23 +1692,22 @@ class AdminController:
         selected_year = (
             request.args.get(
                 "year",
-                default=today.year,
+                default=(
+                    today.year
+                ),
                 type=int
             )
         )
 
-        # -----------------------------------------------------
-        # Prevent invalid month values.
-        # -----------------------------------------------------
         if (
             selected_month < 1
             or selected_month > 12
         ):
-            selected_month = today.month
 
-        # -----------------------------------------------------
-        # Monthly summary
-        # -----------------------------------------------------
+            selected_month = (
+                today.month
+            )
+
         summary = (
             self.bike_model
             .get_monthly_profit(
@@ -1401,15 +1716,15 @@ class AdminController:
             )
         )
 
-        # -----------------------------------------------------
-        # Monthly sales
-        # Database performs filtering.
-        # -----------------------------------------------------
         sales = (
             self.bike_model
             .get_sales_report(
-                year=selected_year,
-                month=selected_month
+                year=(
+                    selected_year
+                ),
+                month=(
+                    selected_month
+                )
             )
         )
 
@@ -1428,9 +1743,6 @@ class AdminController:
             (12, "December")
         ]
 
-        # -----------------------------------------------------
-        # Include current year and previous 9 years.
-        # -----------------------------------------------------
         years = list(
             range(
                 today.year,
@@ -1488,15 +1800,23 @@ class AdminController:
         sales = (
             self.bike_model
             .get_sales_report(
-                year=selected_year,
-                month=selected_month
+                year=(
+                    selected_year
+                ),
+                month=(
+                    selected_month
+                )
             )
         )
 
-        output = io.StringIO()
+        output = (
+            io.StringIO()
+        )
 
-        writer = csv.writer(
-            output
+        writer = (
+            csv.writer(
+                output
+            )
         )
 
         writer.writerow([
@@ -1516,28 +1836,46 @@ class AdminController:
         for bike in sales:
 
             writer.writerow([
-                bike.get("id"),
-                bike.get("name"),
-                bike.get("brand"),
-                bike.get("model"),
+                bike.get(
+                    "id"
+                ),
+
+                bike.get(
+                    "name"
+                ),
+
+                bike.get(
+                    "brand"
+                ),
+
+                bike.get(
+                    "model"
+                ),
+
                 bike.get(
                     "purchase_date"
                 ),
+
                 bike.get(
                     "purchase_price"
                 ),
+
                 bike.get(
                     "sold_date"
                 ),
+
                 bike.get(
                     "sold_price"
                 ),
+
                 bike.get(
                     "additional_expenses"
                 ),
+
                 bike.get(
                     "gross_profit"
                 ),
+
                 bike.get(
                     "net_profit"
                 )
@@ -1560,7 +1898,9 @@ class AdminController:
                 f"_{selected_month:02d}"
             )
 
-        filename += ".csv"
+        filename += (
+            ".csv"
+        )
 
         response = Response(
             output.getvalue(),

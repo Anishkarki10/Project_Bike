@@ -1,1 +1,51 @@
 :root{--red:#D42B2B;--dark:#111111}*{box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:Inter,system-ui,sans-serif}.font-display{font-family:'Barlow Condensed',Inter,sans-serif}.btn-red{display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:white;border-radius:.55rem;padding:.65rem 1.15rem;font-weight:700;transition:.2s}.btn-red:hover{background:#b91c1c}.nav-link{padding:.65rem .9rem;border-radius:.5rem;color:#374151}.nav-link:hover{color:var(--red);background:#f9fafb}.mobile-link{display:block;padding:.8rem 1rem;border-radius:.5rem;font-weight:600;color:#374151}.mobile-link:hover{background:#f9fafb;color:var(--red)}.field{width:100%;border:1px solid #d1d5db;border-radius:.65rem;padding:.72rem .9rem;font-size:.875rem;outline:none;background:#fff}.field:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(212,43,43,.08)}.file-field{width:100%;border:2px dashed #d1d5db;border-radius:.75rem;padding:1rem;font-size:.875rem;background:#f9fafb}.label{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;font-weight:700;margin-bottom:.4rem}.admin-link{display:flex;align-items:center;padding:.75rem .85rem;border-radius:.55rem;color:#d1d5db;font-weight:600}.admin-link:hover{background:rgba(255,255,255,.07);color:#fff}.form-card{background:#fff;border:1px solid #e5e7eb;border-radius:1rem;padding:1.5rem}.form-title{font-family:'Barlow Condensed';font-size:1.45rem;font-weight:800;border-bottom:1px solid #f3f4f6;padding-bottom:.75rem;margin-bottom:1rem}.table-head{padding:.9rem 1rem;text-align:left;font-weight:700}.table-cell{padding:1rem}.status-pill{display:inline-flex;align-items:center;padding:.3rem .6rem;border-radius:999px;font-size:.7rem;font-weight:700}.mini-btn{display:inline-flex;align-items:center;border:1px solid #e5e7eb;border-radius:.45rem;padding:.45rem .65rem;font-size:.75rem;font-weight:700;background:#fff}.mini-btn:hover{background:#f9fafb}
+/* =========================================================
+   FOOTER SOCIAL ICONS
+========================================================= */
+
+.footer-social-link {
+    width: 44px;
+    height: 44px;
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.10);
+
+    color: white;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-decoration: none;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.footer-social-link i {
+    color: white;
+
+    font-size: 20px;
+
+    line-height: 1;
+}
+
+
+.footer-social-link:hover {
+    background: white;
+
+    color: black;
+
+    transform: translateY(-2px);
+}
+
+
+.footer-social-link:hover i {
+    color: black;
+}

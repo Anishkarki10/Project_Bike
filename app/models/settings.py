@@ -30,38 +30,6 @@ class Settings:
         data
     ):
 
-        allowed_fields = {
-            "business_name",
-            "phone",
-            "email",
-            "address",
-            "opening_hours",
-            "tiktok",
-            "facebook",
-            "instagram",
-            "about_content",
-            "logo"
-        }
-
-        # Defensive check:
-        # reject unexpected keys instead of silently accepting
-        # a malformed settings dictionary.
-        unexpected_fields = (
-            set(data.keys())
-            - allowed_fields
-        )
-
-        if unexpected_fields:
-
-            raise ValueError(
-                "Unexpected settings fields: "
-                + ", ".join(
-                    sorted(
-                        unexpected_fields
-                    )
-                )
-            )
-
         db = Database()
 
         db.execute(

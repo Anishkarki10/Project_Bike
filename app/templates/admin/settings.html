@@ -1,440 +1,53 @@
-{% extends "admin/base.html" %}
+<section class="form-card">
 
-{% block title %}
-Settings — Admin
-{% endblock %}
+    <h2 class="form-title">
+        Social Media
+    </h2>
 
-{% block content %}
+    <div class="space-y-4">
 
-<div>
+        <div>
+            <label class="label">
+                TikTok URL
+            </label>
 
-    <!-- =====================================================
-         PAGE HEADER
-    ====================================================== -->
-    <div>
+            <input
+                class="field"
+                type="url"
+                name="tiktok"
+                maxlength="255"
+                value="{{ settings.tiktok or '' }}"
+            >
+        </div>
 
-        <h1 class="font-display text-4xl font-extrabold">
-            Settings
-        </h1>
+        <div>
+            <label class="label">
+                Facebook URL
+            </label>
 
-        <p class="text-gray-500 mt-1">
-            Manage business details shown on the public website.
-        </p>
+            <input
+                class="field"
+                type="url"
+                name="facebook"
+                maxlength="255"
+                value="{{ settings.facebook or '' }}"
+            >
+        </div>
+
+        <div>
+            <label class="label">
+                Instagram URL
+            </label>
+
+            <input
+                class="field"
+                type="url"
+                name="instagram"
+                maxlength="255"
+                value="{{ settings.instagram or '' }}"
+            >
+        </div>
 
     </div>
 
-
-    <!-- =====================================================
-         SETTINGS FORM
-    ====================================================== -->
-    <form
-        method="POST"
-        enctype="multipart/form-data"
-        class="space-y-6 mt-7 max-w-3xl"
-    >
-
-        <!-- =================================================
-             CSRF PROTECTION
-        ================================================== -->
-        <input
-            type="hidden"
-            name="csrf_token"
-            value="{{ csrf_token() }}"
-        >
-
-
-        <!-- =================================================
-             BUSINESS INFORMATION
-        ================================================== -->
-        <section class="form-card">
-
-            <h2 class="form-title">
-                Business Information
-            </h2>
-
-
-            <div class="grid sm:grid-cols-2 gap-4">
-
-                <!-- BUSINESS NAME -->
-                <div class="sm:col-span-2">
-
-                    <label
-                        for="business_name"
-                        class="label"
-                    >
-                        Business Name
-                    </label>
-
-                    <input
-                        id="business_name"
-                        class="field"
-                        type="text"
-                        name="business_name"
-                        maxlength="120"
-                        required
-                        autocomplete="organization"
-                        value="{{ settings.business_name or '' }}"
-                    >
-
-                </div>
-
-
-                <!-- PHONE -->
-                <div>
-
-                    <label
-                        for="phone"
-                        class="label"
-                    >
-                        Phone
-                    </label>
-
-                    <input
-                        id="phone"
-                        class="field"
-                        type="tel"
-                        name="phone"
-                        maxlength="40"
-                        autocomplete="tel"
-                        value="{{ settings.phone or '' }}"
-                        placeholder="9860541990"
-                    >
-
-                    <p class="text-xs text-gray-400 mt-1">
-                        Enter a valid showroom contact number.
-                    </p>
-
-                </div>
-
-
-                <!-- EMAIL -->
-                <div>
-
-                    <label
-                        for="email"
-                        class="label"
-                    >
-                        Email
-                    </label>
-
-                    <input
-                        id="email"
-                        class="field"
-                        type="email"
-                        name="email"
-                        maxlength="150"
-                        autocomplete="email"
-                        value="{{ settings.email or '' }}"
-                        placeholder="info@supautolink.com"
-                    >
-
-                </div>
-
-
-                <!-- ADDRESS -->
-                <div class="sm:col-span-2">
-
-                    <label
-                        for="address"
-                        class="label"
-                    >
-                        Address
-                    </label>
-
-                    <input
-                        id="address"
-                        class="field"
-                        type="text"
-                        name="address"
-                        maxlength="255"
-                        autocomplete="street-address"
-                        value="{{ settings.address or '' }}"
-                        placeholder="Nayabazar-16, Kathmandu, Nepal"
-                    >
-
-                </div>
-
-
-                <!-- OPENING HOURS -->
-                <div class="sm:col-span-2">
-
-                    <label
-                        for="opening_hours"
-                        class="label"
-                    >
-                        Opening Hours
-                    </label>
-
-                    <textarea
-                        id="opening_hours"
-                        class="field min-h-24"
-                        name="opening_hours"
-                        maxlength="1000"
-                        placeholder="Sunday - Friday: 10:00 AM - 7:00 PM"
-                    >{{ settings.opening_hours or '' }}</textarea>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             SOCIAL MEDIA
-        ================================================== -->
-        <section class="form-card">
-
-            <h2 class="form-title">
-                Social Media
-            </h2>
-
-            <p class="text-sm text-gray-500 mt-1 mb-4">
-                Only enter complete HTTPS links to your official pages.
-            </p>
-
-
-            <div class="space-y-4">
-
-                <!-- TIKTOK -->
-                <div>
-
-                    <label
-                        for="tiktok"
-                        class="label"
-                    >
-                        TikTok URL
-                    </label>
-
-                    <input
-                        id="tiktok"
-                        class="field"
-                        type="url"
-                        name="tiktok"
-                        maxlength="255"
-                        value="{{ settings.tiktok or '' }}"
-                        placeholder="https://www.tiktok.com/@..."
-                    >
-
-                </div>
-
-
-                <!-- FACEBOOK -->
-                <div>
-
-                    <label
-                        for="facebook"
-                        class="label"
-                    >
-                        Facebook URL
-                    </label>
-
-                    <input
-                        id="facebook"
-                        class="field"
-                        type="url"
-                        name="facebook"
-                        maxlength="255"
-                        value="{{ settings.facebook or '' }}"
-                        placeholder="https://www.facebook.com/..."
-                    >
-
-                </div>
-
-
-                <!-- INSTAGRAM -->
-                <div>
-
-                    <label
-                        for="instagram"
-                        class="label"
-                    >
-                        Instagram URL
-                    </label>
-
-                    <input
-                        id="instagram"
-                        class="field"
-                        type="url"
-                        name="instagram"
-                        maxlength="255"
-                        value="{{ settings.instagram or '' }}"
-                        placeholder="https://www.instagram.com/..."
-                    >
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             ABOUT US
-        ================================================== -->
-        <section class="form-card">
-
-            <h2 class="form-title">
-                About Us
-            </h2>
-
-
-            <label
-                for="about_content"
-                class="sr-only"
-            >
-                About Us content
-            </label>
-
-            <textarea
-                id="about_content"
-                class="field min-h-40"
-                name="about_content"
-                maxlength="5000"
-                placeholder="Write the business description shown on the public website."
-            >{{ settings.about_content or '' }}</textarea>
-
-
-            <p class="text-xs text-gray-400 mt-2">
-                This content is displayed publicly. Plain text only.
-                Do not enter HTML, JavaScript, passwords or private information.
-            </p>
-
-        </section>
-
-
-        <!-- =================================================
-             LOGO
-        ================================================== -->
-        <section class="form-card">
-
-            <h2 class="form-title">
-                Logo
-            </h2>
-
-
-            <div class="space-y-4">
-
-                <!-- CURRENT LOGO -->
-                {% if settings.logo %}
-
-                    <div>
-
-                        <p class="text-sm text-gray-500 mb-2">
-                            Current Logo
-                        </p>
-
-                        <img
-                            src="{{ url_for('static', filename=settings.logo) }}"
-                            alt="Current Supa Auto Link Logo"
-                            class="w-32 h-32
-                                   object-contain
-                                   bg-white
-                                   border border-gray-200
-                                   rounded-xl p-2"
-                        >
-
-                    </div>
-
-                {% endif %}
-
-
-                <!-- LOGO UPLOAD -->
-                <div>
-
-                    <label
-                        for="logo"
-                        class="label"
-                    >
-                        Upload New Logo
-                    </label>
-
-                    <input
-                        id="logo"
-                        class="file-field"
-                        name="logo"
-                        type="file"
-                        accept=".jpg,.jpeg,.png,.webp"
-                    >
-
-                    <p class="text-xs text-gray-400 mt-2">
-                        Accepted formats: JPG, JPEG, PNG and WEBP.
-                        The backend will verify that the uploaded file is actually an image.
-                    </p>
-
-                </div>
-
-
-                <!-- CURRENT PATH -->
-                {% if settings.logo %}
-
-                    <p class="text-xs text-gray-400 break-all">
-                        Current path:
-                        {{ settings.logo }}
-                    </p>
-
-                {% endif %}
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             SECURITY NOTICE
-        ================================================== -->
-        <div
-            class="bg-blue-50
-                   border border-blue-200
-                   rounded-2xl p-4"
-        >
-
-            <div class="flex items-start gap-3">
-
-                <i
-                    class="fa-solid fa-shield-halved
-                           text-blue-600 mt-1"
-                ></i>
-
-                <p class="text-sm text-blue-800">
-                    These settings affect information displayed
-                    on the public website. Only trusted
-                    administrators should have access to this page.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             ACTIONS
-        ================================================== -->
-        <div class="flex flex-wrap gap-3 pb-8">
-
-            <button
-                type="submit"
-                class="btn-red px-8 py-3"
-            >
-                <i class="fa-solid fa-floppy-disk mr-2"></i>
-                Save Settings
-            </button>
-
-
-            <a
-                href="{{ url_for('admin.dashboard') }}"
-                class="px-8 py-3 rounded-lg
-                       border border-gray-300
-                       font-semibold
-                       hover:bg-gray-50 transition"
-            >
-                Cancel
-            </a>
-
-        </div>
-
-    </form>
-
-</div>
-
-{% endblock %}
+</section>
