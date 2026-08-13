@@ -49,3 +49,57 @@
 .footer-social-link:hover i {
     color: black;
 }
+
+
+/* =========================================================
+   FOOTER TEXT / LINKS
+========================================================= */
+
+.footer-heading {
+    color: #ffffff;
+    font-family: 'Barlow Condensed', Inter, sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: 1.1rem;
+}
+
+.footer-link {
+    color: #9ca3af;
+    transition: color .2s ease;
+}
+
+.footer-link:hover {
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   NAV SOCIAL ICONS
+========================================================= */
+
+.nav-social-link {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    text-decoration: none;
+    transition:
+        background-color .2s ease,
+        color .2s ease,
+        border-color .2s ease,
+        transform .2s ease;
+}
+
+.nav-social-link:hover {
+    background: var(--red);
+    border-color: var(--red);
+    color: #ffffff;
+    transform: translateY(-2px);
+}

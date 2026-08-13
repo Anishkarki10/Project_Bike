@@ -1,5 +1,7 @@
 import os
 
+from datetime import datetime
+
 from flask import (
     Flask,
     render_template
@@ -121,6 +123,20 @@ def create_app(testing=False):
     app.register_blueprint(
         admin_routes.register()
     )
+
+
+    # =====================================================
+    # TEMPLATE GLOBALS
+    #
+    # Makes current_year available to every template
+    # (used in the footer copyright line).
+    # =====================================================
+    @app.context_processor
+    def inject_globals():
+
+        return {
+            "current_year": datetime.now().year
+        }
 
 
     # =====================================================

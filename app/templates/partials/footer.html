@@ -1,72 +1,229 @@
-<!-- =================================================
-     SOCIAL MEDIA
-================================================== -->
-{% if settings and (
-  settings.facebook
-  or settings.instagram
-  or settings.tiktok
-) %}
+<!-- =====================================================
+     SITE FOOTER
+====================================================== -->
+{% set phone = settings.phone if settings and settings.phone else '9860541990' %}
+{% set email = settings.email if settings and settings.email else '' %}
+{% set address = settings.address if settings and settings.address else 'Nayabazar-16, Kathmandu, Nepal' %}
+{% set business = settings.business_name if settings and settings.business_name else 'Supa Auto Link' %}
 
-<div class="mt-6">
+<footer class="bg-[#111111] text-gray-300 mt-20">
 
-  <p class="text-sm font-semibold text-white mb-3">
-      Follow Us
-  </p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
 
-  <div class="flex items-center gap-3">
+        <div
+            class="grid grid-cols-1 sm:grid-cols-2
+                   lg:grid-cols-4 gap-10"
+        >
 
-      <!-- FACEBOOK -->
-      {% if settings.facebook %}
+            <!-- =================================================
+                 BRAND
+            ================================================== -->
+            <div class="space-y-4">
 
-      <a
-          href="{{ settings.facebook }}"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Facebook"
-          title="Facebook"
-          class="footer-social-link"
-      >
-          <i class="fa-brands fa-facebook-f"></i>
-      </a>
+                <div class="flex items-center gap-3">
 
-      {% endif %}
+                    <img
+                        src="{{ url_for('static', filename='images/logo.png') }}"
+                        alt="{{ business }}"
+                        class="w-12 h-12 object-contain"
+                    >
+
+                    <div class="leading-tight">
+
+                        <p
+                            class="font-display text-lg
+                                   font-extrabold tracking-wide text-white"
+                        >
+                            {{ business|upper }}
+                        </p>
+
+                        <p
+                            class="text-[10px] tracking-[0.28em]
+                                   text-gray-500"
+                        >
+                            BUY • SELL • EXCHANGE
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <p class="text-sm text-gray-400 leading-relaxed">
+                    Quality second-hand motorcycles and scooters
+                    in Kathmandu. Trusted buying, selling and
+                    exchange, made simple.
+                </p>
+
+            </div>
 
 
-      <!-- INSTAGRAM -->
-      {% if settings.instagram %}
+            <!-- =================================================
+                 QUICK LINKS
+            ================================================== -->
+            <div>
 
-      <a
-          href="{{ settings.instagram }}"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Instagram"
-          title="Instagram"
-          class="footer-social-link"
-      >
-          <i class="fa-brands fa-instagram"></i>
-      </a>
+                <p class="footer-heading">
+                    Quick Links
+                </p>
 
-      {% endif %}
+                <ul class="space-y-2 text-sm">
+
+                    <li>
+                        <a href="{{ url_for('public.home') }}" class="footer-link">
+                            Home
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('public.bikes') }}" class="footer-link">
+                            Available Bikes
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('public.about') }}" class="footer-link">
+                            About Us
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('public.contact') }}" class="footer-link">
+                            Contact
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
 
 
-      <!-- TIKTOK -->
-      {% if settings.tiktok %}
+            <!-- =================================================
+                 CONTACT
+            ================================================== -->
+            <div>
 
-      <a
-          href="{{ settings.tiktok }}"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="TikTok"
-          title="TikTok"
-          class="footer-social-link"
-      >
-          <i class="fa-brands fa-tiktok"></i>
-      </a>
+                <p class="footer-heading">
+                    Get In Touch
+                </p>
 
-      {% endif %}
+                <ul class="space-y-3 text-sm text-gray-400">
 
-  </div>
+                    <li class="flex items-start gap-3">
+                        <i class="fa-solid fa-location-dot mt-1 text-red-500"></i>
+                        <span>{{ address }}</span>
+                    </li>
 
-</div>
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-phone text-red-500"></i>
+                        <a href="tel:{{ phone }}" class="footer-link">
+                            {{ phone }}
+                        </a>
+                    </li>
 
-{% endif %}
+                    {% if email %}
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-envelope text-red-500"></i>
+                        <a href="mailto:{{ email }}" class="footer-link">
+                            {{ email }}
+                        </a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+
+            </div>
+
+
+            <!-- =================================================
+                 SOCIAL MEDIA
+            ================================================== -->
+            <div>
+
+                <p class="footer-heading">
+                    Follow Us
+                </p>
+
+                {% if settings and (settings.facebook or settings.instagram or settings.tiktok) %}
+
+                <div class="flex items-center gap-3">
+
+                    {% if settings.facebook %}
+                    <a
+                        href="{{ settings.facebook }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Facebook"
+                        title="Facebook"
+                        class="footer-social-link"
+                    >
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+                    {% endif %}
+
+                    {% if settings.instagram %}
+                    <a
+                        href="{{ settings.instagram }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Instagram"
+                        title="Instagram"
+                        class="footer-social-link"
+                    >
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    {% endif %}
+
+                    {% if settings.tiktok %}
+                    <a
+                        href="{{ settings.tiktok }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="TikTok"
+                        title="TikTok"
+                        class="footer-social-link"
+                    >
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+                    {% endif %}
+
+                </div>
+
+                {% else %}
+
+                <p class="text-sm text-gray-500">
+                    Social links coming soon.
+                </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         BOTTOM BAR
+    ====================================================== -->
+    <div class="border-t border-white/10">
+
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5
+                   flex flex-col sm:flex-row items-center
+                   justify-between gap-3 text-xs text-gray-500"
+        >
+
+            <p>
+                © {{ current_year }} {{ business }}. All rights reserved.
+            </p>
+
+            <p class="tracking-[0.2em]">
+                BUY • SELL • EXCHANGE
+            </p>
+
+        </div>
+
+    </div>
+
+</footer>
