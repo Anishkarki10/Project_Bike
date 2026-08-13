@@ -106,9 +106,22 @@
             >
 
                 <!-- SOCIAL ICONS -->
-                {% if settings and (settings.facebook or settings.instagram or settings.tiktok) %}
+                {% if settings and (settings.whatsapp or settings.facebook or settings.instagram or settings.tiktok) %}
 
                 <div class="flex items-center gap-1.5">
+
+                    {% if settings.whatsapp %}
+                    <a
+                        href="https://wa.me/{{ settings.whatsapp }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="WhatsApp"
+                        title="Message us on WhatsApp"
+                        class="nav-social-link"
+                    >
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                    {% endif %}
 
                     {% if settings.facebook %}
                     <a
@@ -267,9 +280,22 @@
 
 
         <!-- MOBILE SOCIAL ICONS -->
-        {% if settings and (settings.facebook or settings.instagram or settings.tiktok) %}
+        {% if settings and (settings.whatsapp or settings.facebook or settings.instagram or settings.tiktok) %}
 
         <div class="flex items-center justify-center gap-3 pt-4 mt-2 border-t border-gray-100">
+
+            {% if settings.whatsapp %}
+            <a
+                href="https://wa.me/{{ settings.whatsapp }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp"
+                title="Message us on WhatsApp"
+                class="nav-social-link"
+            >
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+            {% endif %}
 
             {% if settings.facebook %}
             <a

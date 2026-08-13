@@ -103,3 +103,45 @@
     color: #ffffff;
     transform: translateY(-2px);
 }
+
+
+/* =========================================================
+   ADMIN SOCIAL INPUT GROUP
+========================================================= */
+
+.social-input {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: .65rem;
+    overflow: hidden;
+    background: #fff;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.social-input:focus-within {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(212, 43, 43, .08);
+}
+
+.social-input-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    flex-shrink: 0;
+    background: #f9fafb;
+    border-right: 1px solid #e5e7eb;
+    font-size: 1rem;
+}
+
+.social-input input {
+    flex: 1;
+    border: 0;
+    outline: none;
+    padding: .72rem .9rem;
+    font-size: .875rem;
+    background: transparent;
+    min-width: 0;
+}

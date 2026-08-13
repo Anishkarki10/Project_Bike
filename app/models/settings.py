@@ -45,6 +45,7 @@ class Settings:
                 tiktok = %s,
                 facebook = %s,
                 instagram = %s,
+                whatsapp = %s,
                 about_content = %s,
                 logo = %s
 
@@ -81,6 +82,10 @@ class Settings:
 
                 data.get(
                     "instagram"
+                ),
+
+                data.get(
+                    "whatsapp"
                 ),
 
                 data.get(

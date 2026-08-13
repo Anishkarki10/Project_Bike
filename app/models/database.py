@@ -525,6 +525,8 @@ class Database:
 
                 instagram VARCHAR(255),
 
+                whatsapp VARCHAR(40),
+
                 about_content TEXT,
 
                 logo VARCHAR(255)
@@ -532,6 +534,16 @@ class Database:
 
             ) ENGINE=InnoDB
             """
+        )
+
+        # =====================================================
+        # SETTINGS MIGRATIONS
+        # =====================================================
+        Database.add_column_if_missing(
+            db,
+            "settings",
+            "whatsapp",
+            "VARCHAR(40) NULL"
         )
 
         # =====================================================

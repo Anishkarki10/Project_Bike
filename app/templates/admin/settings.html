@@ -1,53 +1,316 @@
-<section class="form-card">
+{% extends "admin/base.html" %}
 
-    <h2 class="form-title">
-        Social Media
-    </h2>
+{% block title %}
+Settings — Admin
+{% endblock %}
 
-    <div class="space-y-4">
+{% block content %}
 
-        <div>
-            <label class="label">
-                TikTok URL
-            </label>
+<div>
 
-            <input
-                class="field"
-                type="url"
-                name="tiktok"
-                maxlength="255"
-                value="{{ settings.tiktok or '' }}"
-            >
-        </div>
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+    <div>
 
-        <div>
-            <label class="label">
-                Facebook URL
-            </label>
+        <h1 class="font-display text-4xl font-extrabold">
+            Settings
+        </h1>
 
-            <input
-                class="field"
-                type="url"
-                name="facebook"
-                maxlength="255"
-                value="{{ settings.facebook or '' }}"
-            >
-        </div>
-
-        <div>
-            <label class="label">
-                Instagram URL
-            </label>
-
-            <input
-                class="field"
-                type="url"
-                name="instagram"
-                maxlength="255"
-                value="{{ settings.instagram or '' }}"
-            >
-        </div>
+        <p class="text-gray-500 mt-1">
+            Manage your business details, contact information
+            and social media links shown on the public site.
+        </p>
 
     </div>
 
-</section>
+
+    {% set s = settings or {} %}
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+        class="space-y-6 mt-7 max-w-4xl"
+    >
+
+        <!-- CSRF PROTECTION -->
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+
+        <!-- =================================================
+             BUSINESS INFORMATION
+        ================================================== -->
+        <section class="form-card">
+
+            <h2 class="form-title">
+                Business Information
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-4">
+
+                <div class="md:col-span-2">
+                    <label class="label">Business Name</label>
+                    <input
+                        class="field"
+                        type="text"
+                        name="business_name"
+                        maxlength="120"
+                        required
+                        value="{{ s.business_name or '' }}"
+                    >
+                </div>
+
+                <div>
+                    <label class="label">Phone</label>
+                    <input
+                        class="field"
+                        type="text"
+                        name="phone"
+                        maxlength="40"
+                        value="{{ s.phone or '' }}"
+                    >
+                </div>
+
+                <div>
+                    <label class="label">Email</label>
+                    <input
+                        class="field"
+                        type="email"
+                        name="email"
+                        maxlength="150"
+                        value="{{ s.email or '' }}"
+                    >
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             LOCATION & HOURS
+        ================================================== -->
+        <section class="form-card">
+
+            <h2 class="form-title">
+                Location &amp; Hours
+            </h2>
+
+            <div class="space-y-4">
+
+                <div>
+                    <label class="label">Address</label>
+                    <input
+                        class="field"
+                        type="text"
+                        name="address"
+                        maxlength="255"
+                        value="{{ s.address or '' }}"
+                    >
+                </div>
+
+                <div>
+                    <label class="label">Opening Hours</label>
+                    <textarea
+                        class="field min-h-24"
+                        name="opening_hours"
+                        maxlength="500"
+                        placeholder="e.g. Sun–Fri: 10:00 AM – 7:00 PM"
+                    >{{ s.opening_hours or '' }}</textarea>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ABOUT
+        ================================================== -->
+        <section class="form-card">
+
+            <h2 class="form-title">
+                About
+            </h2>
+
+            <div>
+                <label class="label">About Content</label>
+                <textarea
+                    class="field min-h-36"
+                    name="about_content"
+                    maxlength="5000"
+                    placeholder="Tell customers about your showroom…"
+                >{{ s.about_content or '' }}</textarea>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SOCIAL MEDIA
+        ================================================== -->
+        <section class="form-card">
+
+            <h2 class="form-title">
+                Social Media
+            </h2>
+
+            <p class="text-sm text-gray-500 -mt-2 mb-5">
+                Paste the full profile URL. Leave a field empty
+                to hide that icon from the site.
+            </p>
+
+            <div class="space-y-4">
+
+                <!-- WHATSAPP -->
+                <div>
+                    <label class="label">WhatsApp</label>
+                    <div class="social-input">
+                        <span class="social-input-icon" style="color:#25D366">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </span>
+                        <input
+                            type="text"
+                            inputmode="tel"
+                            name="whatsapp"
+                            maxlength="40"
+                            placeholder="9779860541990"
+                            value="{{ s.whatsapp or '' }}"
+                        >
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">
+                        Number with country code, digits only
+                        (e.g. 977 for Nepal → 9779860541990).
+                        Opens a chat for customer messages.
+                    </p>
+                </div>
+
+
+                <!-- FACEBOOK -->
+                <div>
+                    <label class="label">Facebook</label>
+                    <div class="social-input">
+                        <span class="social-input-icon" style="color:#1877F2">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </span>
+                        <input
+                            type="url"
+                            name="facebook"
+                            maxlength="255"
+                            placeholder="https://facebook.com/yourpage"
+                            value="{{ s.facebook or '' }}"
+                        >
+                    </div>
+                </div>
+
+                <!-- INSTAGRAM -->
+                <div>
+                    <label class="label">Instagram</label>
+                    <div class="social-input">
+                        <span class="social-input-icon" style="color:#E1306C">
+                            <i class="fa-brands fa-instagram"></i>
+                        </span>
+                        <input
+                            type="url"
+                            name="instagram"
+                            maxlength="255"
+                            placeholder="https://instagram.com/yourhandle"
+                            value="{{ s.instagram or '' }}"
+                        >
+                    </div>
+                </div>
+
+                <!-- TIKTOK -->
+                <div>
+                    <label class="label">TikTok</label>
+                    <div class="social-input">
+                        <span class="social-input-icon" style="color:#111111">
+                            <i class="fa-brands fa-tiktok"></i>
+                        </span>
+                        <input
+                            type="url"
+                            name="tiktok"
+                            maxlength="255"
+                            placeholder="https://tiktok.com/@yourhandle"
+                            value="{{ s.tiktok or '' }}"
+                        >
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             LOGO
+        ================================================== -->
+        <section class="form-card">
+
+            <h2 class="form-title">
+                Logo
+            </h2>
+
+            <div class="flex items-center gap-5">
+
+                <img
+                    src="{{ url_for('static', filename=s.logo or 'images/logo.png') }}"
+                    alt="Current logo"
+                    class="w-16 h-16 object-contain
+                           rounded-lg border border-gray-200 bg-white p-1"
+                >
+
+                <div class="flex-1">
+                    <label class="label">Replace Logo</label>
+                    <input
+                        class="file-field"
+                        type="file"
+                        name="logo"
+                        accept="image/png, image/jpeg, image/webp"
+                    >
+                    <p class="text-xs text-gray-400 mt-1">
+                        PNG, JPG or WEBP. Leave empty to keep the current logo.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+        <div class="flex flex-wrap gap-3 pb-8">
+
+            <button
+                type="submit"
+                class="btn-red px-7 py-3"
+            >
+                Save Settings
+            </button>
+
+            <a
+                class="px-7 py-3 rounded-lg border
+                       border-gray-300 font-semibold
+                       hover:bg-gray-50"
+                href="{{ url_for('admin.dashboard') }}"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

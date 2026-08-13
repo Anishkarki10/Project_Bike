@@ -1565,6 +1565,91 @@ class AdminController:
                 )
 
             # =================================================
+            # SOCIAL MEDIA
+            # =================================================
+            tiktok = (
+                request.form.get(
+                    "tiktok",
+                    ""
+                )
+                .strip()
+            )
+
+            facebook = (
+                request.form.get(
+                    "facebook",
+                    ""
+                )
+                .strip()
+            )
+
+            instagram = (
+                request.form.get(
+                    "instagram",
+                    ""
+                )
+                .strip()
+            )
+
+            for label, value in (
+                ("TikTok", tiktok),
+                ("Facebook", facebook),
+                ("Instagram", instagram)
+            ):
+
+                if len(value) > 255:
+
+                    flash(
+                        f"{label} URL cannot exceed "
+                        "255 characters.",
+                        "danger"
+                    )
+
+                    return render_template(
+                        "admin/settings.html",
+
+                        settings=data,
+
+                        new_inquiries=(
+                            self.inquiry_model
+                            .count_new()
+                        )
+                    )
+
+            # =================================================
+            # WHATSAPP
+            #
+            # Stored as digits only (country code + number),
+            # used to build a wa.me click-to-chat link.
+            # =================================================
+            whatsapp = "".join(
+                ch
+                for ch in request.form.get(
+                    "whatsapp",
+                    ""
+                )
+                if ch.isdigit()
+            )
+
+            if len(whatsapp) > 20:
+
+                flash(
+                    "WhatsApp number is too long.",
+                    "danger"
+                )
+
+                return render_template(
+                    "admin/settings.html",
+
+                    settings=data,
+
+                    new_inquiries=(
+                        self.inquiry_model
+                        .count_new()
+                    )
+                )
+
+            # =================================================
             # UPDATE CLEAN DATA
             # =================================================
             data.update({
@@ -1587,15 +1672,17 @@ class AdminController:
                 "about_content":
                     about_content,
 
-                # No social media handles currently
                 "tiktok":
-                    None,
+                    tiktok or None,
 
                 "facebook":
-                    None,
+                    facebook or None,
 
                 "instagram":
-                    None
+                    instagram or None,
+
+                "whatsapp":
+                    whatsapp or None
             })
 
             # =================================================
