@@ -6,27 +6,27 @@ Mark Bike Sold - Supa Auto Link
 
 {% block content %}
 
-<div class="max-w-4xl mx-auto p-6">
+<div class="max-w-4xl mx-auto">
 
     <!-- =====================================================
          PAGE HEADER
     ====================================================== -->
-    <div class="mb-8">
+    <div>
 
         <a
             href="{{ url_for('admin.bikes') }}"
             class="inline-flex items-center gap-2
-                   text-gray-500 hover:text-gray-900 mb-4"
+                   text-sm text-gray-500 hover:text-gray-900"
         >
             <i class="fa-solid fa-arrow-left"></i>
             Back to Bikes
         </a>
 
-        <h1 class="text-3xl font-bold text-gray-900">
+        <h1 class="font-display text-4xl font-extrabold mt-2">
             Mark Bike as Sold
         </h1>
 
-        <p class="text-gray-500 mt-2">
+        <p class="text-gray-500 mt-1">
             Enter the actual sale information.
             The system will calculate gross and net profit automatically.
         </p>
@@ -37,10 +37,7 @@ Mark Bike Sold - Supa Auto Link
     <!-- =====================================================
          BIKE INFORMATION
     ====================================================== -->
-    <div
-        class="bg-white border border-gray-200
-               rounded-2xl shadow-sm p-6 mb-6"
-    >
+    <div class="form-card mt-7">
 
         <div class="flex flex-col md:flex-row gap-6">
 
@@ -126,10 +123,7 @@ Mark Bike Sold - Supa Auto Link
     <!-- =====================================================
          PURCHASE INFORMATION
     ====================================================== -->
-    <div
-        class="bg-white border border-gray-200
-               rounded-2xl shadow-sm p-6 mb-6"
-    >
+    <div class="form-card mt-6">
 
         <div class="flex justify-between gap-4 mb-5">
 
@@ -239,8 +233,7 @@ Mark Bike Sold - Supa Auto Link
     <form
         method="POST"
         action="{{ url_for('admin.mark_bike_sold', bike_id=bike.id) }}"
-        class="bg-white border border-gray-200
-               rounded-2xl shadow-sm p-6"
+        class="form-card mt-6"
     >
 
         <!-- CSRF PROTECTION -->
@@ -255,28 +248,21 @@ Mark Bike Sold - Supa Auto Link
         </h2>
 
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             <!-- SOLD DATE -->
             <div>
 
-                <label
-                    class="block text-sm font-semibold
-                           text-gray-700 mb-2"
-                >
-                    Sold Date
-                    <span class="text-red-500">*</span>
+                <label class="label">
+                    Sold Date *
                 </label>
 
                 <input
+                    class="field"
                     type="date"
                     name="sold_date"
                     value="{{ today }}"
                     required
-                    class="w-full px-4 py-3
-                           border border-gray-300
-                           rounded-xl outline-none
-                           focus:ring-2 focus:ring-red-500"
                 >
 
             </div>
@@ -285,28 +271,21 @@ Mark Bike Sold - Supa Auto Link
             <!-- SOLD PRICE -->
             <div>
 
-                <label
-                    class="block text-sm font-semibold
-                           text-gray-700 mb-2"
-                >
-                    Actual Sold Price
-                    <span class="text-red-500">*</span>
+                <label class="label">
+                    Actual Sold Price *
                 </label>
 
                 <input
+                    class="field"
                     type="number"
                     name="sold_price"
                     min="0.01"
                     step="0.01"
                     required
                     placeholder="Example: 285000"
-                    class="w-full px-4 py-3
-                           border border-gray-300
-                           rounded-xl outline-none
-                           focus:ring-2 focus:ring-red-500"
                 >
 
-                <p class="text-xs text-gray-500 mt-2">
+                <p class="text-xs text-gray-400 mt-1">
                     Enter what the customer actually paid, not the advertised price.
                 </p>
 
@@ -316,27 +295,21 @@ Mark Bike Sold - Supa Auto Link
             <!-- EXPENSES -->
             <div class="md:col-span-2">
 
-                <label
-                    class="block text-sm font-semibold
-                           text-gray-700 mb-2"
-                >
+                <label class="label">
                     Total Additional Expenses
                 </label>
 
                 <input
+                    class="field"
                     type="number"
                     name="additional_expenses"
                     min="0"
                     step="0.01"
                     value="{{ bike.additional_expenses or 0 }}"
                     placeholder="Example: 5000"
-                    class="w-full px-4 py-3
-                           border border-gray-300
-                           rounded-xl outline-none
-                           focus:ring-2 focus:ring-red-500"
                 >
 
-                <p class="text-xs text-gray-500 mt-2">
+                <p class="text-xs text-gray-400 mt-1">
                     Total repair, servicing, detailing, transport and other costs associated with this bike.
                 </p>
 
@@ -423,10 +396,9 @@ Mark Bike Sold - Supa Auto Link
 
             <a
                 href="{{ url_for('admin.bikes') }}"
-                class="px-6 py-3 border
-                       border-gray-300 text-gray-700
-                       rounded-xl font-semibold text-center
-                       hover:bg-gray-50 transition"
+                class="px-7 py-3 rounded-lg border
+                       border-gray-300 font-semibold text-center
+                       hover:bg-gray-50"
             >
                 Cancel
             </a>
@@ -436,10 +408,7 @@ Mark Bike Sold - Supa Auto Link
 
                 <button
                     type="submit"
-                    class="px-6 py-3 bg-red-600
-                           text-white rounded-xl
-                           font-semibold hover:bg-red-700
-                           transition"
+                    class="btn-red px-7 py-3"
                 >
                     <i class="fa-solid fa-check mr-2"></i>
                     Confirm Sale
@@ -449,8 +418,8 @@ Mark Bike Sold - Supa Auto Link
 
                 <a
                     href="{{ url_for('admin.edit_bike', bike_id=bike.id) }}"
-                    class="px-6 py-3 bg-gray-900
-                           text-white rounded-xl
+                    class="px-7 py-3 rounded-lg
+                           bg-gray-900 text-white
                            font-semibold text-center
                            hover:bg-black transition"
                 >

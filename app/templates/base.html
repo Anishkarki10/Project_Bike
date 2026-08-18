@@ -10,14 +10,116 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <meta
-        name="description"
-        content="Supa Auto Link — Buy, sell and exchange quality second-hand motorcycles and scooters in Kathmandu, Nepal."
-    >
+
+    <!-- =====================================================
+         PAGE TITLE
+    ====================================================== -->
 
     <title>
-        {% block title %}Supa Auto Link{% endblock %}
+        {% block title %}
+        Supa Auto Link | Second-Hand Bikes in Kathmandu
+        {% endblock %}
     </title>
+
+
+    <!-- =====================================================
+         META DESCRIPTION
+    ====================================================== -->
+
+    <meta
+        name="description"
+        content="{% block meta_description %}Buy, sell and exchange quality second-hand motorcycles and scooters in Kathmandu, Nepal with Supa Auto Link.{% endblock %}"
+    >
+
+
+    <!-- =====================================================
+         SEARCH ENGINE INDEXING
+    ====================================================== -->
+
+    <meta
+        name="robots"
+        content="{% block robots %}index, follow{% endblock %}"
+    >
+
+
+    <!-- =====================================================
+         CANONICAL URL
+    ====================================================== -->
+
+    <link
+        rel="canonical"
+        href="{% block canonical %}{{ request.base_url }}{% endblock %}"
+    >
+
+
+    <!-- =====================================================
+         OPEN GRAPH
+    ====================================================== -->
+
+    <meta
+        property="og:site_name"
+        content="Supa Auto Link"
+    >
+
+    <meta
+        property="og:type"
+        content="{% block og_type %}website{% endblock %}"
+    >
+
+    <meta
+        property="og:title"
+        content="{% block og_title %}Supa Auto Link | Second-Hand Bikes in Kathmandu{% endblock %}"
+    >
+
+    <meta
+        property="og:description"
+        content="{% block og_description %}Browse quality second-hand motorcycles and scooters in Kathmandu with transparent pricing and clear vehicle information.{% endblock %}"
+    >
+
+    <meta
+        property="og:url"
+        content="{{ request.base_url }}"
+    >
+
+    <meta
+        property="og:image"
+        content="{% block og_image %}{{ url_for('static', filename='images/logo.png', _external=True) }}{% endblock %}"
+    >
+
+    <meta
+        property="og:image:alt"
+        content="{% block og_image_alt %}Supa Auto Link motorcycle showroom in Kathmandu{% endblock %}"
+    >
+
+    <meta
+        property="og:locale"
+        content="en_NP"
+    >
+
+
+    <!-- =====================================================
+         TWITTER / X
+    ====================================================== -->
+
+    <meta
+        name="twitter:card"
+        content="summary_large_image"
+    >
+
+    <meta
+        name="twitter:title"
+        content="{% block twitter_title %}Supa Auto Link | Second-Hand Bikes in Kathmandu{% endblock %}"
+    >
+
+    <meta
+        name="twitter:description"
+        content="{% block twitter_description %}Browse quality second-hand motorcycles and scooters in Kathmandu, Nepal.{% endblock %}"
+    >
+
+    <meta
+        name="twitter:image"
+        content="{% block twitter_image %}{{ url_for('static', filename='images/logo.png', _external=True) }}{% endblock %}"
+    >
 
 
     <!-- =====================================================
@@ -31,9 +133,21 @@
     >
 
     <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
->
+        rel="apple-touch-icon"
+        href="{{ url_for('static', filename='images/logo.png') }}"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
     <!-- =====================================================
          GOOGLE FONTS
     ====================================================== -->
@@ -72,7 +186,111 @@
     >
 
 
-    {% block head %}{% endblock %}
+    <!-- =====================================================
+         LOCAL BUSINESS STRUCTURED DATA
+    ====================================================== -->
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MotorcycleDealer",
+
+        "name":
+            {{ (
+                settings.business_name
+                if settings and settings.business_name
+                else "Supa Auto Link"
+            ) | tojson }},
+
+        "url":
+            {{ url_for(
+                'public.home',
+                _external=True
+            ) | tojson }},
+
+        "logo":
+            {{ url_for(
+                'static',
+                filename='images/logo.png',
+                _external=True
+            ) | tojson }},
+
+        "image":
+            {{ url_for(
+                'static',
+                filename='images/logo.png',
+                _external=True
+            ) | tojson }},
+
+        "telephone":
+            {{ (
+                settings.phone
+                if settings and settings.phone
+                else "9860541990"
+            ) | tojson }},
+
+        {% if settings and settings.email %}
+
+        "email":
+            {{ settings.email | tojson }},
+
+        {% endif %}
+
+        "address": {
+            "@type": "PostalAddress",
+
+            "streetAddress":
+                {{ (
+                    settings.address
+                    if settings and settings.address
+                    else "Nayabazar-16, Kathmandu, Nepal"
+                ) | tojson }},
+
+            "addressLocality": "Kathmandu",
+
+            "addressCountry": "NP"
+        },
+
+        "areaServed": {
+            "@type": "City",
+            "name": "Kathmandu"
+        }
+
+        {% if settings and (
+            settings.facebook
+            or settings.instagram
+            or settings.tiktok
+        ) %},
+
+        "sameAs": [
+
+            {% if settings.facebook %}
+                {{ settings.facebook | tojson }}
+                {% if settings.instagram or settings.tiktok %},{% endif %}
+            {% endif %}
+
+            {% if settings.instagram %}
+                {{ settings.instagram | tojson }}
+                {% if settings.tiktok %},{% endif %}
+            {% endif %}
+
+            {% if settings.tiktok %}
+                {{ settings.tiktok | tojson }}
+            {% endif %}
+
+        ]
+
+        {% endif %}
+    }
+    </script>
+
+
+    <!-- =====================================================
+         PAGE-SPECIFIC SEO / HEAD CONTENT
+    ====================================================== -->
+
+    {% block head %}
+    {% endblock %}
 
 </head>
 
@@ -100,6 +318,7 @@
                 class="fixed top-20 right-4
                        z-[100] space-y-2
                        max-w-sm"
+
                 aria-live="polite"
             >
 
@@ -116,18 +335,23 @@
                             bg-white
 
                             {% if category == 'success' %}
+
                                 border-green-200
                                 text-green-700
 
                             {% elif category == 'danger' %}
+
                                 border-red-200
                                 text-red-700
 
                             {% else %}
+
                                 border-amber-200
                                 text-amber-700
+
                             {% endif %}
                         "
+
                         role="status"
                     >
 
@@ -152,7 +376,6 @@
     <main>
 
         {% block content %}
-
         {% endblock %}
 
     </main>
@@ -178,7 +401,6 @@
 
 
     {% block scripts %}
-
     {% endblock %}
 
 

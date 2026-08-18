@@ -1,11 +1,14 @@
 import re
 
+from xml.sax.saxutils import escape
+
 from flask import (
     render_template,
     request,
     redirect,
     url_for,
-    flash
+    flash,
+    Response
 )
 
 from app.models.bike import Bike
@@ -30,7 +33,8 @@ class PublicController:
     def _common(self):
 
         return {
-            "settings": self.settings_model.get()
+            "settings":
+                self.settings_model.get()
         }
 
     # =========================================================
@@ -48,14 +52,22 @@ class PublicController:
             or ""
         ).strip()
 
-        if required and not value:
+        if (
+            required
+            and not value
+        ):
             return None
 
         if len(value) > max_length:
             return None
 
+        # -----------------------------------------------------
         # Reject control characters except:
-        # tab, newline and carriage return.
+        #
+        # tab
+        # newline
+        # carriage return
+        # -----------------------------------------------------
         for char in value:
 
             if (
@@ -89,13 +101,14 @@ class PublicController:
         if len(value) > 40:
             return None
 
-        # Allows examples such as:
+        # -----------------------------------------------------
+        # Allows examples:
         #
         # 9860541990
         # +9779860541990
         # +977 9860541990
         # 01-1234567
-        #
+        # -----------------------------------------------------
         if not re.fullmatch(
             r"[0-9+\-\s()]{7,40}",
             value
@@ -130,7 +143,7 @@ class PublicController:
             or ""
         ).strip().lower()
 
-        # Optional field
+        # Email is optional.
         if not value:
             return None
 
@@ -171,6 +184,7 @@ class PublicController:
             TypeError,
             ValueError
         ):
+
             return None
 
         if (
@@ -235,25 +249,39 @@ class PublicController:
             .lower()
         )
 
+        # -----------------------------------------------------
+        # CATEGORY WHITELIST
+        # -----------------------------------------------------
         if category not in {
             "",
             "motorcycle",
             "scooter"
         }:
+
             category = ""
 
-        min_price = self._price_filter(
-            request.args.get(
-                "min_price"
+        # -----------------------------------------------------
+        # PRICE FILTERS
+        # -----------------------------------------------------
+        min_price = (
+            self._price_filter(
+                request.args.get(
+                    "min_price"
+                )
             )
         )
 
-        max_price = self._price_filter(
-            request.args.get(
-                "max_price"
+        max_price = (
+            self._price_filter(
+                request.args.get(
+                    "max_price"
+                )
             )
         )
 
+        # -----------------------------------------------------
+        # INVALID PRICE RANGE
+        # -----------------------------------------------------
         if (
             min_price is not None
             and max_price is not None
@@ -264,6 +292,7 @@ class PublicController:
             max_price = None
 
         filters = {
+
             "search":
                 search or None,
 
@@ -290,6 +319,9 @@ class PublicController:
             )
         )
 
+        # -----------------------------------------------------
+        # LOAD GALLERY IMAGES
+        # -----------------------------------------------------
         for bike in rows:
 
             bike["images"] = (
@@ -302,6 +334,7 @@ class PublicController:
         data = self._common()
 
         data.update({
+
             "bikes":
                 rows,
 
@@ -342,20 +375,22 @@ class PublicController:
         # -----------------------------------------------------
         # Never expose draft inventory publicly.
         #
-        # Sold bikes remain viewable here.
-        # If you do NOT want sold bikes visible,
-        # change this to:
-        #
-        # if bike.get("status") != "available":
+        # Sold bikes remain publicly viewable.
         # -----------------------------------------------------
-        if bike.get(
-            "status"
-        ) == "draft":
+        if (
+            bike.get(
+                "status"
+            )
+            == "draft"
+        ):
 
             return render_template(
                 "notfound.html"
             ), 404
 
+        # -----------------------------------------------------
+        # LOAD BIKE IMAGES
+        # -----------------------------------------------------
         bike["images"] = (
             self.bike_model
             .get_images(
@@ -363,10 +398,15 @@ class PublicController:
             )
         )
 
-        cover_image = bike.get(
-            "cover_image"
+        cover_image = (
+            bike.get(
+                "cover_image"
+            )
         )
 
+        # -----------------------------------------------------
+        # PUT COVER IMAGE FIRST
+        # -----------------------------------------------------
         if (
             cover_image
             and cover_image
@@ -378,6 +418,9 @@ class PublicController:
                 cover_image
             )
 
+        # -----------------------------------------------------
+        # FALLBACK TO COVER IMAGE
+        # -----------------------------------------------------
         if not bike["images"]:
 
             bike["images"] = (
@@ -386,6 +429,9 @@ class PublicController:
                 else []
             )
 
+        # -----------------------------------------------------
+        # FEATURE LIST
+        # -----------------------------------------------------
         bike["feature_list"] = [
 
             feature.strip()
@@ -398,7 +444,6 @@ class PublicController:
             ).split(",")
 
             if feature.strip()
-
         ]
 
         data = self._common()
@@ -551,14 +596,15 @@ class PublicController:
                 )
             )
 
-        # Require at least some meaningful non-whitespace text.
         meaningful_message = re.sub(
             r"\s+",
             "",
             message
         )
 
-        if len(meaningful_message) < 3:
+        if len(
+            meaningful_message
+        ) < 3:
 
             flash(
                 "Please enter a more detailed message.",
@@ -575,7 +621,7 @@ class PublicController:
         # -----------------------------------------------------
         # BIKE
         #
-        # Never trust a bike name supplied by the browser.
+        # Never trust the bike name supplied by the browser.
         # -----------------------------------------------------
         bike_id_raw = (
             request.form.get(
@@ -645,6 +691,9 @@ class PublicController:
                     )
                 )
 
+            # -------------------------------------------------
+            # INQUIRIES ONLY FOR AVAILABLE BIKES
+            # -------------------------------------------------
             if (
                 bike.get(
                     "status"
@@ -663,17 +712,20 @@ class PublicController:
                     )
                 )
 
-            # ---------------------------------------------
-            # Trusted server-side value.
-            # ---------------------------------------------
-            bike_name = bike.get(
-                "name"
+            # -------------------------------------------------
+            # TRUSTED DATABASE VALUE
+            # -------------------------------------------------
+            bike_name = (
+                bike.get(
+                    "name"
+                )
             )
 
         # -----------------------------------------------------
         # STORE INQUIRY
         # -----------------------------------------------------
         self.inquiry_model.create({
+
             "name":
                 name,
 
@@ -713,5 +765,190 @@ class PublicController:
         return redirect(
             url_for(
                 "public.contact"
+            )
+        )
+
+    # =========================================================
+    # ROBOTS.TXT
+    # =========================================================
+    def robots_txt(self):
+
+        sitemap_url = url_for(
+            "public.sitemap_xml",
+            _external=True
+        )
+
+        content = (
+            "User-agent: *\n"
+            "Allow: /\n"
+            "Disallow: /admin\n"
+            "\n"
+            f"Sitemap: {sitemap_url}\n"
+        )
+
+        return Response(
+            content,
+            content_type=(
+                "text/plain; "
+                "charset=utf-8"
+            )
+        )
+
+    # =========================================================
+    # SITEMAP.XML
+    # =========================================================
+    def sitemap_xml(self):
+
+        # -----------------------------------------------------
+        # STATIC PUBLIC PAGES
+        # -----------------------------------------------------
+        urls = [
+            {
+                "loc":
+                    url_for(
+                        "public.home",
+                        _external=True
+                    ),
+
+                "changefreq":
+                    "daily",
+
+                "priority":
+                    "1.0"
+            },
+
+            {
+                "loc":
+                    url_for(
+                        "public.bikes",
+                        _external=True
+                    ),
+
+                "changefreq":
+                    "daily",
+
+                "priority":
+                    "0.9"
+            },
+
+            {
+                "loc":
+                    url_for(
+                        "public.about",
+                        _external=True
+                    ),
+
+                "changefreq":
+                    "monthly",
+
+                "priority":
+                    "0.6"
+            },
+
+            {
+                "loc":
+                    url_for(
+                        "public.contact",
+                        _external=True
+                    ),
+
+                "changefreq":
+                    "monthly",
+
+                "priority":
+                    "0.6"
+            }
+        ]
+
+        # -----------------------------------------------------
+        # AVAILABLE BIKE DETAIL PAGES
+        # -----------------------------------------------------
+        bikes = (
+            self.bike_model
+            .get_all(
+                status="available"
+            )
+        )
+
+        for bike in bikes:
+
+            urls.append({
+
+                "loc":
+                    url_for(
+                        "public.bike_detail",
+                        bike_id=(
+                            bike["id"]
+                        ),
+                        _external=True
+                    ),
+
+                "changefreq":
+                    "weekly",
+
+                "priority":
+                    "0.8"
+            })
+
+        # -----------------------------------------------------
+        # XML START
+        # -----------------------------------------------------
+        xml = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+
+            (
+                '<urlset '
+                'xmlns="http://www.sitemaps.org/'
+                'schemas/sitemap/0.9">'
+            )
+        ]
+
+        # -----------------------------------------------------
+        # XML URL ENTRIES
+        # -----------------------------------------------------
+        for item in urls:
+
+            safe_url = escape(
+                item["loc"]
+            )
+
+            xml.extend([
+                "    <url>",
+
+                (
+                    "        <loc>"
+                    f"{safe_url}"
+                    "</loc>"
+                ),
+
+                (
+                    "        <changefreq>"
+                    f"{item['changefreq']}"
+                    "</changefreq>"
+                ),
+
+                (
+                    "        <priority>"
+                    f"{item['priority']}"
+                    "</priority>"
+                ),
+
+                "    </url>"
+            ])
+
+        # -----------------------------------------------------
+        # XML END
+        # -----------------------------------------------------
+        xml.append(
+            "</urlset>"
+        )
+
+        return Response(
+            "\n".join(
+                xml
+            ),
+            content_type=(
+                "application/xml; "
+                "charset=utf-8"
             )
         )

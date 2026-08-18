@@ -1,16 +1,272 @@
 {% extends "base.html" %}
 
+
+{# =========================================================
+   SEO VARIABLES
+========================================================= #}
+
+{% set seo_title =
+    bike.name
+    ~ (" " ~ bike.year if bike.year else "")
+    ~ " for Sale in Kathmandu | Supa Auto Link"
+%}
+
+
+{% set seo_description =
+    (
+        bike.short_description
+        if bike.short_description
+        else
+        "View "
+        ~ bike.name
+        ~ (" " ~ bike.model if bike.model else "")
+        ~ (" " ~ bike.year if bike.year else "")
+        ~ " at Supa Auto Link. Quality second-hand motorcycle or scooter in Kathmandu, Nepal."
+    )
+%}
+
+
+{# =========================================================
+   SEO IMAGE
+========================================================= #}
+
+{% if bike.images %}
+
+    {% set seo_image =
+        bike.images[0]
+        if bike.images[0].startswith("http")
+        else url_for(
+            "static",
+            filename="uploads/bikes/" ~ bike.images[0],
+            _external=True
+        )
+    %}
+
+{% elif bike.cover_image %}
+
+    {% set seo_image =
+        bike.cover_image
+        if bike.cover_image.startswith("http")
+        else url_for(
+            "static",
+            filename="uploads/bikes/" ~ bike.cover_image,
+            _external=True
+        )
+    %}
+
+{% else %}
+
+    {% set seo_image =
+        url_for(
+            "static",
+            filename="images/logo.png",
+            _external=True
+        )
+    %}
+
+{% endif %}
+
+
+{# =========================================================
+   PAGE TITLE
+========================================================= #}
+
 {% block title %}
-{{ bike.name }} — Supa Auto Link
+{{ seo_title }}
 {% endblock %}
+
+
+{# =========================================================
+   META DESCRIPTION
+========================================================= #}
+
+{% block meta_description %}
+{{ seo_description|striptags|truncate(160, True, '') }}
+{% endblock %}
+
+
+{# =========================================================
+   CANONICAL
+========================================================= #}
+
+{% block canonical %}
+{{ request.base_url }}
+{% endblock %}
+
+
+{# =========================================================
+   OPEN GRAPH
+========================================================= #}
+
+{% block og_type %}
+product
+{% endblock %}
+
+
+{% block og_title %}
+{{ seo_title }}
+{% endblock %}
+
+
+{% block og_description %}
+{{ seo_description|striptags|truncate(200, True, '') }}
+{% endblock %}
+
+
+{% block og_image %}
+{{ seo_image }}
+{% endblock %}
+
+
+{% block og_image_alt %}
+{{ bike.name }}{% if bike.year %} {{ bike.year }}{% endif %} at Supa Auto Link
+{% endblock %}
+
+
+{# =========================================================
+   TWITTER / X
+========================================================= #}
+
+{% block twitter_title %}
+{{ seo_title }}
+{% endblock %}
+
+
+{% block twitter_description %}
+{{ seo_description|striptags|truncate(200, True, '') }}
+{% endblock %}
+
+
+{% block twitter_image %}
+{{ seo_image }}
+{% endblock %}
+
+
+{# =========================================================
+   BIKE STRUCTURED DATA
+========================================================= #}
+
+{% block head %}
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Motorcycle",
+
+    "name": {{ bike.name | tojson }},
+
+    "url": {{ request.base_url | tojson }},
+
+    "image": {{ seo_image | tojson }},
+
+    {% if bike.short_description or bike.full_description %}
+    "description": {{
+        (
+            bike.short_description
+            or bike.full_description
+        )
+        | striptags
+        | tojson
+    }},
+    {% endif %}
+
+    {% if bike.brand %}
+    "brand": {
+        "@type": "Brand",
+        "name": {{ bike.brand | tojson }}
+    },
+    {% endif %}
+
+    {% if bike.model %}
+    "model": {{ bike.model | tojson }},
+    {% endif %}
+
+    {% if bike.year %}
+    "vehicleModelDate": {{ bike.year|string | tojson }},
+    {% endif %}
+
+    {% if bike.colour %}
+    "color": {{ bike.colour | tojson }},
+    {% endif %}
+
+    {% if bike.fuel_type %}
+    "fuelType": {{ bike.fuel_type | tojson }},
+    {% endif %}
+
+    {% if bike.engine_cc %}
+    "vehicleEngine": {
+        "@type": "EngineSpecification",
+        "engineDisplacement": {
+            "@type": "QuantitativeValue",
+            "value": {{ bike.engine_cc }},
+            "unitText": "cc"
+        }
+    },
+    {% endif %}
+
+    {% if bike.km_travelled is not none %}
+    "mileageFromOdometer": {
+        "@type": "QuantitativeValue",
+        "value": {{ bike.km_travelled or 0 }},
+        "unitCode": "KMT"
+    },
+    {% endif %}
+
+    {% if bike.price %}
+    "offers": {
+
+        "@type": "Offer",
+
+        "url": {{ request.base_url | tojson }},
+
+        "priceCurrency": "NPR",
+
+        "price": {{ bike.price }},
+
+        "itemCondition":
+            "https://schema.org/UsedCondition",
+
+        "availability":
+            {% if bike.status == "available" %}
+            "https://schema.org/InStock"
+            {% else %}
+            "https://schema.org/SoldOut"
+            {% endif %},
+
+        "seller": {
+            "@type": "Organization",
+            "name": "Supa Auto Link"
+        }
+    }
+    {% else %}
+    "seller": {
+        "@type": "Organization",
+        "name": "Supa Auto Link"
+    }
+    {% endif %}
+}
+</script>
+
+{% endblock %}
+
+
+{# =========================================================
+   PAGE CONTENT
+========================================================= #}
 
 {% block content %}
 
+
 {% set phone = settings.phone if settings and settings.phone else "9860541990" %}
+
 
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    <!-- BACK -->
+
+    <!-- =====================================================
+         BACK
+    ====================================================== -->
+
     <a
         href="{{ url_for('public.bikes') }}"
         class="text-sm font-semibold text-gray-500 hover:text-red-600"
@@ -22,13 +278,18 @@
     <!-- =====================================================
          MAIN BIKE SECTION
     ====================================================== -->
+
     <div class="grid lg:grid-cols-2 gap-10 mt-5">
 
 
         <!-- =================================================
              IMAGE GALLERY
         ================================================== -->
+
         <div>
+
+
+            <!-- MAIN IMAGE -->
 
             <div
                 class="bg-gray-100 rounded-2xl
@@ -41,6 +302,7 @@
 
                     <img
                         data-main-bike-image
+
                         src="{{
                             first
                             if first.startswith('http')
@@ -49,14 +311,20 @@
                                 filename='uploads/bikes/' ~ first
                             )
                         }}"
+
                         class="w-full h-full object-cover"
-                        alt="{{ bike.name }}"
+
+                        alt="{{ bike.name }}{% if bike.year %} {{ bike.year }}{% endif %}"
+
+                        fetchpriority="high"
                     >
+
 
                 {% elif bike.cover_image %}
 
                     <img
                         data-main-bike-image
+
                         src="{{
                             bike.cover_image
                             if bike.cover_image.startswith('http')
@@ -65,9 +333,14 @@
                                 filename='uploads/bikes/' ~ bike.cover_image
                             )
                         }}"
+
                         class="w-full h-full object-cover"
-                        alt="{{ bike.name }}"
+
+                        alt="{{ bike.name }}{% if bike.year %} {{ bike.year }}{% endif %}"
+
+                        fetchpriority="high"
                     >
+
 
                 {% else %}
 
@@ -90,7 +363,10 @@
             </div>
 
 
-            <!-- THUMBNAILS -->
+            <!-- =================================================
+                 THUMBNAILS
+            ================================================== -->
+
             {% if bike.images and bike.images|length > 1 %}
 
                 <div class="grid grid-cols-4 gap-3 mt-3">
@@ -99,11 +375,13 @@
 
                         <button
                             type="button"
+
                             class="rounded-lg overflow-hidden
                                    aspect-[4/3]
                                    border border-gray-200
                                    hover:border-red-500
                                    transition"
+
                             data-bike-thumb="{{
                                 image
                                 if image.startswith('http')
@@ -112,7 +390,8 @@
                                     filename='uploads/bikes/' ~ image
                                 )
                             }}"
-                            aria-label="View image {{ loop.index }}"
+
+                            aria-label="View {{ bike.name }} image {{ loop.index }}"
                         >
 
                             <img
@@ -124,8 +403,11 @@
                                         filename='uploads/bikes/' ~ image
                                     )
                                 }}"
+
                                 class="w-full h-full object-cover"
-                                alt="{{ bike.name }} image {{ loop.index }}"
+
+                                alt="{{ bike.name }}{% if bike.year %} {{ bike.year }}{% endif %} image {{ loop.index }}"
+
                                 loading="lazy"
                             >
 
@@ -140,14 +422,17 @@
         </div>
 
 
-
         <!-- =================================================
              BIKE DETAILS
         ================================================== -->
+
         <div>
 
 
-            <!-- STATUS -->
+            <!-- =================================================
+                 STATUS
+            ================================================== -->
+
             <div class="flex items-center gap-2">
 
                 {% if bike.status == "available" %}
@@ -160,6 +445,7 @@
                         Available
                     </span>
 
+
                 {% elif bike.status == "sold" %}
 
                     <span
@@ -169,6 +455,7 @@
                     >
                         Sold
                     </span>
+
 
                 {% else %}
 
@@ -190,7 +477,10 @@
             </div>
 
 
-            <!-- NAME -->
+            <!-- =================================================
+                 NAME
+            ================================================== -->
+
             <h1
                 class="font-display text-5xl
                        font-extrabold mt-4"
@@ -199,7 +489,10 @@
             </h1>
 
 
-            <!-- BRAND -->
+            <!-- =================================================
+                 BRAND / MODEL / YEAR
+            ================================================== -->
+
             <p class="text-gray-500 mt-1">
 
                 {{ bike.brand }}
@@ -215,7 +508,10 @@
             </p>
 
 
-            <!-- PRICE -->
+            <!-- =================================================
+                 PRICE
+            ================================================== -->
+
             {% if bike.price %}
 
                 <p
@@ -237,7 +533,10 @@
             {% endif %}
 
 
-            <!-- ORIGINAL PRICE -->
+            <!-- =================================================
+                 ORIGINAL PRICE
+            ================================================== -->
+
             {% if bike.original_price %}
 
                 <p class="text-sm text-gray-400 line-through mt-1">
@@ -247,7 +546,10 @@
             {% endif %}
 
 
-            <!-- SHORT DESCRIPTION -->
+            <!-- =================================================
+                 SHORT DESCRIPTION
+            ================================================== -->
+
             {% if bike.short_description %}
 
                 <p
@@ -260,14 +562,15 @@
             {% endif %}
 
 
-
             <!-- =================================================
                  SPECIFICATIONS
             ================================================== -->
+
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-7">
 
 
                 <!-- ENGINE -->
+
                 <div
                     class="rounded-xl bg-gray-50
                            border border-gray-200 p-4"
@@ -284,9 +587,13 @@
                     <p class="font-semibold mt-1">
 
                         {% if bike.engine_cc %}
+
                             {{ bike.engine_cc }}cc
+
                         {% else %}
+
                             —
+
                         {% endif %}
 
                     </p>
@@ -295,6 +602,7 @@
 
 
                 <!-- KILOMETRES -->
+
                 <div
                     class="rounded-xl bg-gray-50
                            border border-gray-200 p-4"
@@ -326,6 +634,7 @@
 
 
                 <!-- FUEL -->
+
                 <div
                     class="rounded-xl bg-gray-50
                            border border-gray-200 p-4"
@@ -347,6 +656,7 @@
 
 
                 <!-- TRANSMISSION -->
+
                 <div
                     class="rounded-xl bg-gray-50
                            border border-gray-200 p-4"
@@ -368,6 +678,7 @@
 
 
                 <!-- COLOUR -->
+
                 <div
                     class="rounded-xl bg-gray-50
                            border border-gray-200 p-4"
@@ -389,6 +700,7 @@
 
 
                 <!-- OWNERS -->
+
                 <div
                     class="rounded-xl bg-gray-50
                            border border-gray-200 p-4"
@@ -403,7 +715,13 @@
                     </p>
 
                     <p class="font-semibold mt-1">
-                        {{ bike.owners if bike.owners is not none else "—" }}
+
+                        {{
+                            bike.owners
+                            if bike.owners is not none
+                            else "—"
+                        }}
+
                     </p>
 
                 </div>
@@ -411,29 +729,42 @@
             </div>
 
 
-
             <!-- =================================================
-                 CALL / INQUIRY BUTTONS
+                 ACTION BUTTONS
             ================================================== -->
+
             <div class="flex flex-wrap gap-3 mt-7">
+
+
+                <!-- CALL -->
 
                 <a
                     href="tel:{{ phone }}"
+
                     class="btn-red px-6 py-3"
+
                     aria-label="Call Supa Auto Link at {{ phone }}"
                 >
+
                     <i class="fa-solid fa-phone mr-2"></i>
+
                     Call Now
+
                 </a>
 
+
+                <!-- INQUIRY -->
 
                 {% if bike.status == "available" %}
 
                     <a
                         href="#inquiry"
+
                         class="px-6 py-3 rounded-lg
                                border border-gray-300
-                               font-bold hover:border-red-600"
+                               font-bold
+                               hover:border-red-600
+                               transition"
                     >
                         Send Inquiry
                     </a>
@@ -447,10 +778,10 @@
     </div>
 
 
-
     <!-- =====================================================
          DESCRIPTION + INQUIRY
     ====================================================== -->
+
     <div
         class="grid lg:grid-cols-[1fr_360px]
                gap-10 mt-14"
@@ -460,10 +791,14 @@
         <!-- =================================================
              LEFT CONTENT
         ================================================== -->
+
         <div class="space-y-8">
 
 
-            <!-- DESCRIPTION -->
+            <!-- =================================================
+                 DESCRIPTION
+            ================================================== -->
+
             <section>
 
                 <h2
@@ -472,7 +807,6 @@
                 >
                     Description
                 </h2>
-
 
                 <p
                     class="mt-4 text-gray-600
@@ -488,8 +822,10 @@
             </section>
 
 
+            <!-- =================================================
+                 FEATURES
+            ================================================== -->
 
-            <!-- FEATURES -->
             {% if bike.feature_list %}
 
                 <section>
@@ -500,7 +836,6 @@
                     >
                         Features
                     </h2>
-
 
                     <div class="grid sm:grid-cols-2 gap-3 mt-4">
 
@@ -522,8 +857,10 @@
             {% endif %}
 
 
+            <!-- =================================================
+                 KNOWN ISSUES
+            ================================================== -->
 
-            <!-- KNOWN ISSUES -->
             {% if bike.known_issues %}
 
                 <section>
@@ -547,8 +884,10 @@
             {% endif %}
 
 
+            <!-- =================================================
+                 SERVICE INFORMATION
+            ================================================== -->
 
-            <!-- SERVICE -->
             {% if bike.service_info %}
 
                 <section>
@@ -572,8 +911,10 @@
             {% endif %}
 
 
+            <!-- =================================================
+                 DOCUMENTATION
+            ================================================== -->
 
-            <!-- DOCUMENTATION -->
             {% if bike.doc_info %}
 
                 <section>
@@ -599,19 +940,26 @@
         </div>
 
 
-
         <!-- =================================================
              INQUIRY SIDEBAR
         ================================================== -->
+
         <aside
             id="inquiry"
+
             class="h-fit rounded-2xl
                    border border-gray-200
                    p-6 shadow-sm
                    lg:sticky lg:top-28"
         >
 
+
+            <!-- =================================================
+                 AVAILABLE BIKE
+            ================================================== -->
+
             {% if bike.status == "available" %}
+
 
                 <h3
                     class="font-display
@@ -626,17 +974,23 @@
                 </p>
 
 
-
-                <!-- =========================================
+                <!-- =============================================
                      INQUIRY FORM
-                ========================================== -->
+                ============================================== -->
+
                 <form
                     action="{{ url_for('public.submit_inquiry') }}"
+
                     method="POST"
+
                     class="space-y-3 mt-5"
                 >
 
-                    <!-- CSRF PROTECTION -->
+
+                    <!-- =========================================
+                         CSRF
+                    ========================================== -->
+
                     <input
                         type="hidden"
                         name="csrf_token"
@@ -644,7 +998,10 @@
                     >
 
 
-                    <!-- BIKE ID -->
+                    <!-- =========================================
+                         BIKE ID
+                    ========================================== -->
+
                     <input
                         type="hidden"
                         name="bike_id"
@@ -652,7 +1009,10 @@
                     >
 
 
-                    <!-- BIKE NAME -->
+                    <!-- =========================================
+                         BIKE NAME
+                    ========================================== -->
+
                     <input
                         type="hidden"
                         name="bike_interested"
@@ -660,7 +1020,10 @@
                     >
 
 
-                    <!-- NAME -->
+                    <!-- =========================================
+                         NAME
+                    ========================================== -->
+
                     <div>
 
                         <label
@@ -672,19 +1035,29 @@
 
                         <input
                             id="inquiry-name"
+
                             class="field"
+
                             type="text"
+
                             name="name"
+
                             maxlength="120"
+
                             autocomplete="name"
+
                             required
+
                             placeholder="Full name"
                         >
 
                     </div>
 
 
-                    <!-- PHONE -->
+                    <!-- =========================================
+                         PHONE
+                    ========================================== -->
+
                     <div>
 
                         <label
@@ -696,19 +1069,29 @@
 
                         <input
                             id="inquiry-phone"
+
                             class="field"
+
                             type="tel"
+
                             name="phone"
+
                             maxlength="40"
+
                             autocomplete="tel"
+
                             required
+
                             placeholder="Phone number"
                         >
 
                     </div>
 
 
-                    <!-- EMAIL -->
+                    <!-- =========================================
+                         EMAIL
+                    ========================================== -->
+
                     <div>
 
                         <label
@@ -720,18 +1103,27 @@
 
                         <input
                             id="inquiry-email"
+
                             class="field"
+
                             name="email"
+
                             type="email"
+
                             maxlength="150"
+
                             autocomplete="email"
+
                             placeholder="Email (optional)"
                         >
 
                     </div>
 
 
-                    <!-- MESSAGE -->
+                    <!-- =========================================
+                         MESSAGE
+                    ========================================== -->
+
                     <div>
 
                         <label
@@ -743,19 +1135,28 @@
 
                         <textarea
                             id="inquiry-message"
+
                             class="field min-h-28"
+
                             name="message"
+
                             maxlength="2000"
+
                             required
+
                             placeholder="I am interested in {{ bike.name }}..."
                         ></textarea>
 
                     </div>
 
 
-                    <!-- SUBMIT -->
+                    <!-- =========================================
+                         SUBMIT
+                    ========================================== -->
+
                     <button
                         type="submit"
+
                         class="btn-red w-full py-3"
                     >
                         Submit Inquiry
@@ -764,26 +1165,33 @@
                 </form>
 
 
+                <!-- =============================================
+                     CALL
+                ============================================== -->
 
-                <!-- CALL -->
                 <a
                     href="tel:{{ phone }}"
+
                     class="block text-center mt-3
                            py-3 rounded-lg
                            bg-gray-100 font-bold
                            hover:bg-gray-200 transition"
                 >
+
                     <i class="fa-solid fa-phone mr-1"></i>
 
                     Call {{ phone }}
+
                 </a>
 
 
             {% else %}
 
-                <!-- =========================================
+
+                <!-- =================================================
                      SOLD BIKE
-                ========================================== -->
+                ================================================== -->
+
                 <div class="text-center py-4">
 
                     <div
@@ -791,10 +1199,12 @@
                                bg-gray-100 rounded-full
                                flex items-center justify-center"
                     >
+
                         <i
                             class="fa-solid fa-circle-check
                                    text-gray-500 text-xl"
                         ></i>
+
                     </div>
 
 
@@ -813,6 +1223,7 @@
 
                     <a
                         href="{{ url_for('public.bikes') }}"
+
                         class="btn-red block text-center mt-5"
                     >
                         Browse Available Bikes
@@ -827,5 +1238,6 @@
     </div>
 
 </section>
+
 
 {% endblock %}

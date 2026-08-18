@@ -1758,6 +1758,96 @@ class AdminController:
         )
 
     # =========================================================
+    # CHANGE ADMIN PASSWORD
+    # =========================================================
+    def change_password(self):
+
+        current_password = request.form.get(
+            "current_password",
+            ""
+        )
+
+        new_password = request.form.get(
+            "new_password",
+            ""
+        )
+
+        confirm_password = request.form.get(
+            "confirm_password",
+            ""
+        )
+
+        user = (
+            self.user_model
+            .find_by_id(
+                session.get("admin_id")
+            )
+        )
+
+        if (
+            not user
+            or not self.user_model.check_password(
+                user["password"],
+                current_password
+            )
+        ):
+
+            flash(
+                "Current password is incorrect.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "admin.settings"
+                )
+            )
+
+        if new_password != confirm_password:
+
+            flash(
+                "New password and confirmation do not match.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "admin.settings"
+                )
+            )
+
+        try:
+
+            self.user_model.update_password(
+                user["id"],
+                new_password
+            )
+
+        except ValueError as error:
+
+            flash(
+                str(error),
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "admin.settings"
+                )
+            )
+
+        flash(
+            "Password changed successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "admin.settings"
+            )
+        )
+
+    # =========================================================
     # SALES & PROFIT
     # =========================================================
     def sales(self):

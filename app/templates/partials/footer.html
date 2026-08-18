@@ -1,23 +1,35 @@
 <!-- =====================================================
      SITE FOOTER
 ====================================================== -->
+
 {% set phone = settings.phone if settings and settings.phone else '9860541990' %}
 {% set email = settings.email if settings and settings.email else '' %}
 {% set address = settings.address if settings and settings.address else 'Nayabazar-16, Kathmandu, Nepal' %}
 {% set business = settings.business_name if settings and settings.business_name else 'Supa Auto Link' %}
 
+
 <footer class="bg-[#111111] text-gray-300 mt-20">
+
+    <!-- =====================================================
+         MAIN FOOTER
+    ====================================================== -->
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
 
         <div
-            class="grid grid-cols-1 sm:grid-cols-2
-                   lg:grid-cols-4 gap-10"
+            class="
+                grid
+                grid-cols-1
+                sm:grid-cols-2
+                lg:grid-cols-4
+                gap-10
+            "
         >
 
             <!-- =================================================
                  BRAND
             ================================================== -->
+
             <div class="space-y-4">
 
                 <div class="flex items-center gap-3">
@@ -26,20 +38,29 @@
                         src="{{ url_for('static', filename='images/logo.png') }}"
                         alt="{{ business }}"
                         class="w-12 h-12 object-contain"
+                        loading="lazy"
                     >
 
                     <div class="leading-tight">
 
                         <p
-                            class="font-display text-lg
-                                   font-extrabold tracking-wide text-white"
+                            class="
+                                font-display
+                                text-lg
+                                font-extrabold
+                                tracking-wide
+                                text-white
+                            "
                         >
                             {{ business|upper }}
                         </p>
 
                         <p
-                            class="text-[10px] tracking-[0.28em]
-                                   text-gray-500"
+                            class="
+                                text-[10px]
+                                tracking-[0.28em]
+                                text-gray-500
+                            "
                         >
                             BUY • SELL • EXCHANGE
                         </p>
@@ -48,7 +69,14 @@
 
                 </div>
 
-                <p class="text-sm text-gray-400 leading-relaxed">
+
+                <p
+                    class="
+                        text-sm
+                        text-gray-400
+                        leading-relaxed
+                    "
+                >
                     Quality second-hand motorcycles and scooters
                     in Kathmandu. Trusted buying, selling and
                     exchange, made simple.
@@ -60,6 +88,7 @@
             <!-- =================================================
                  QUICK LINKS
             ================================================== -->
+
             <div>
 
                 <p class="footer-heading">
@@ -69,27 +98,50 @@
                 <ul class="space-y-2 text-sm">
 
                     <li>
-                        <a href="{{ url_for('public.home') }}" class="footer-link">
+
+                        <a
+                            href="{{ url_for('public.home') }}"
+                            class="footer-link"
+                        >
                             Home
                         </a>
+
                     </li>
 
+
                     <li>
-                        <a href="{{ url_for('public.bikes') }}" class="footer-link">
+
+                        <a
+                            href="{{ url_for('public.bikes') }}"
+                            class="footer-link"
+                        >
                             Available Bikes
                         </a>
+
                     </li>
 
+
                     <li>
-                        <a href="{{ url_for('public.about') }}" class="footer-link">
+
+                        <a
+                            href="{{ url_for('public.about') }}"
+                            class="footer-link"
+                        >
                             About Us
                         </a>
+
                     </li>
 
+
                     <li>
-                        <a href="{{ url_for('public.contact') }}" class="footer-link">
+
+                        <a
+                            href="{{ url_for('public.contact') }}"
+                            class="footer-link"
+                        >
                             Contact
                         </a>
+
                     </li>
 
                 </ul>
@@ -100,6 +152,7 @@
             <!-- =================================================
                  CONTACT
             ================================================== -->
+
             <div>
 
                 <p class="footer-heading">
@@ -108,25 +161,71 @@
 
                 <ul class="space-y-3 text-sm text-gray-400">
 
+                    <!-- ADDRESS -->
+
                     <li class="flex items-start gap-3">
-                        <i class="fa-solid fa-location-dot mt-1 text-red-500"></i>
-                        <span>{{ address }}</span>
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-location-dot
+                                mt-1
+                                text-red-500
+                            "
+                        ></i>
+
+                        <span>
+                            {{ address }}
+                        </span>
+
                     </li>
 
+
+                    <!-- PHONE -->
+
                     <li class="flex items-center gap-3">
-                        <i class="fa-solid fa-phone text-red-500"></i>
-                        <a href="tel:{{ phone }}" class="footer-link">
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-phone
+                                text-red-500
+                            "
+                        ></i>
+
+                        <a
+                            href="tel:{{ phone }}"
+                            class="footer-link"
+                        >
                             {{ phone }}
                         </a>
+
                     </li>
 
+
+                    <!-- EMAIL -->
+
                     {% if email %}
+
                     <li class="flex items-center gap-3">
-                        <i class="fa-solid fa-envelope text-red-500"></i>
-                        <a href="mailto:{{ email }}" class="footer-link">
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-envelope
+                                text-red-500
+                            "
+                        ></i>
+
+                        <a
+                            href="mailto:{{ email }}"
+                            class="footer-link"
+                        >
                             {{ email }}
                         </a>
+
                     </li>
+
                     {% endif %}
 
                 </ul>
@@ -137,17 +236,28 @@
             <!-- =================================================
                  SOCIAL MEDIA
             ================================================== -->
+
             <div>
 
                 <p class="footer-heading">
                     Follow Us
                 </p>
 
-                {% if settings and (settings.whatsapp or settings.facebook or settings.instagram or settings.tiktok) %}
+
+                {% if settings and (
+                    settings.whatsapp
+                    or settings.facebook
+                    or settings.instagram
+                    or settings.tiktok
+                ) %}
 
                 <div class="flex items-center gap-3">
 
+
+                    <!-- WHATSAPP -->
+
                     {% if settings.whatsapp %}
+
                     <a
                         href="https://wa.me/{{ settings.whatsapp }}"
                         target="_blank"
@@ -158,9 +268,14 @@
                     >
                         <i class="fa-brands fa-whatsapp"></i>
                     </a>
+
                     {% endif %}
 
+
+                    <!-- FACEBOOK -->
+
                     {% if settings.facebook %}
+
                     <a
                         href="{{ settings.facebook }}"
                         target="_blank"
@@ -171,9 +286,14 @@
                     >
                         <i class="fa-brands fa-facebook-f"></i>
                     </a>
+
                     {% endif %}
 
+
+                    <!-- INSTAGRAM -->
+
                     {% if settings.instagram %}
+
                     <a
                         href="{{ settings.instagram }}"
                         target="_blank"
@@ -184,9 +304,14 @@
                     >
                         <i class="fa-brands fa-instagram"></i>
                     </a>
+
                     {% endif %}
 
+
+                    <!-- TIKTOK -->
+
                     {% if settings.tiktok %}
+
                     <a
                         href="{{ settings.tiktok }}"
                         target="_blank"
@@ -197,9 +322,11 @@
                     >
                         <i class="fa-brands fa-tiktok"></i>
                     </a>
+
                     {% endif %}
 
                 </div>
+
 
                 {% else %}
 
@@ -219,21 +346,259 @@
     <!-- =====================================================
          BOTTOM BAR
     ====================================================== -->
-    <div class="border-t border-white/10">
+
+    <div class="border-t border-white/10 bg-[#0d0d0d]">
 
         <div
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5
-                   flex flex-col sm:flex-row items-center
-                   justify-between gap-3 text-xs text-gray-500"
+            class="
+                max-w-7xl
+                mx-auto
+
+                px-4
+                sm:px-6
+                lg:px-8
+
+                py-5
+
+                flex
+                flex-col
+                md:flex-row
+
+                items-center
+                justify-between
+
+                gap-5
+            "
         >
 
-            <p>
-                © {{ current_year }} {{ business }}. All rights reserved.
+            <!-- =================================================
+                 COPYRIGHT
+            ================================================== -->
+
+            <p
+                class="
+                    text-xs
+                    text-gray-500
+                    text-center
+                    md:text-left
+                "
+            >
+                © 2026 {{ business }}.
+                All rights reserved.
             </p>
 
-            <p class="tracking-[0.2em]">
-                BUY • SELL • EXCHANGE
-            </p>
+
+            <!-- =================================================
+                 DEVELOPER / CONTACT CTA
+            ================================================== -->
+
+            <a
+                href="https://www.anishkarki.com"
+                target="_blank"
+                rel="noopener noreferrer"
+
+                aria-label="Contact Anish Karki for website development"
+                title="Want a website like this? Contact Anish Karki"
+
+                class="
+                    group
+
+                    inline-flex
+                    items-center
+
+                    gap-4
+
+                    px-5
+                    py-3
+
+                    rounded-2xl
+
+                    bg-white/[0.05]
+
+                    border
+                    border-white/10
+
+                    hover:bg-white/[0.08]
+                    hover:border-red-500/50
+
+                    transition-all
+                    duration-300
+                "
+            >
+
+                <!-- =============================================
+                     CODE ICON
+                ============================================== -->
+
+                <div
+                    class="
+                        w-11
+                        h-11
+
+                        flex
+                        items-center
+                        justify-center
+
+                        shrink-0
+
+                        rounded-xl
+
+                        bg-red-500/10
+                        text-red-500
+
+                        text-lg
+
+                        group-hover:bg-red-500
+                        group-hover:text-white
+
+                        transition-all
+                        duration-300
+                    "
+                >
+
+                    <i class="fa-solid fa-code"></i>
+
+                </div>
+
+
+                <!-- =============================================
+                     CTA CONTENT
+                ============================================== -->
+
+                <div class="leading-tight">
+
+
+                    <!-- QUESTION -->
+
+                    <p
+                        class="
+                            text-[9px]
+                            sm:text-[10px]
+
+                            font-semibold
+                            uppercase
+
+                            tracking-[0.20em]
+
+                            text-gray-500
+
+                            group-hover:text-gray-400
+
+                            transition-colors
+                            duration-300
+                        "
+                    >
+                        Want a website like this?
+                    </p>
+
+
+                    <!-- DEVELOPER -->
+
+                    <p
+                        class="
+                            mt-1
+
+                            text-xs
+                            sm:text-sm
+
+                            text-gray-300
+                        "
+                    >
+
+                        Designed & developed by
+
+                        <span
+                            class="
+                                font-bold
+                                text-white
+                            "
+                        >
+                            Anish Karki
+                        </span>
+
+                    </p>
+
+
+                    <!-- CONTACT CTA -->
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            gap-2
+
+                            mt-1.5
+
+                            text-xs
+                            font-bold
+
+                            text-red-500
+
+                            group-hover:text-red-400
+
+                            transition-colors
+                            duration-300
+                        "
+                    >
+
+                        <span>
+                            Let's work together
+                        </span>
+
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-arrow-right
+
+                                text-[10px]
+
+                                transition-transform
+                                duration-300
+
+                                group-hover:translate-x-1
+                            "
+                        ></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                     EXTERNAL LINK ICON
+                ============================================== -->
+
+                <div
+                    class="
+                        hidden
+                        sm:flex
+
+                        items-center
+                        justify-center
+
+                        ml-1
+
+                        text-gray-600
+
+                        group-hover:text-red-400
+
+                        transition-colors
+                        duration-300
+                    "
+                >
+
+                    <i
+                        class="
+                            fa-solid
+                            fa-arrow-up-right-from-square
+                            text-xs
+                        "
+                    ></i>
+
+                </div>
+
+            </a>
 
         </div>
 

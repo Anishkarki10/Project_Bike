@@ -236,6 +236,24 @@ class AdminRoutes:
 
 
         # =====================================================
+        # CHANGE ADMIN PASSWORD
+        #
+        # POST only because it changes account state.
+        # CSRF token must be included in the settings form.
+        # =====================================================
+        self.bp.route(
+            "/settings/password",
+            methods=[
+                "POST"
+            ]
+        )(
+            admin_required(
+                self.controller.change_password
+            )
+        )
+
+
+        # =====================================================
         # SALES & PROFIT
         # =====================================================
         self.bp.route(

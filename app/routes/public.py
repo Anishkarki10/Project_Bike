@@ -13,8 +13,9 @@ class PublicRoutes:
             __name__
         )
 
-        self.controller = PublicController()
-
+        self.controller = (
+            PublicController()
+        )
 
     def register(self):
 
@@ -27,7 +28,6 @@ class PublicRoutes:
             self.controller.home
         )
 
-
         # =====================================================
         # AVAILABLE BIKES
         # =====================================================
@@ -36,7 +36,6 @@ class PublicRoutes:
         )(
             self.controller.bikes
         )
-
 
         # =====================================================
         # BIKE DETAILS
@@ -47,7 +46,6 @@ class PublicRoutes:
             self.controller.bike_detail
         )
 
-
         # =====================================================
         # ABOUT
         # =====================================================
@@ -56,7 +54,6 @@ class PublicRoutes:
         )(
             self.controller.about
         )
-
 
         # =====================================================
         # CONTACT
@@ -67,28 +64,47 @@ class PublicRoutes:
             self.controller.contact
         )
 
+        # =====================================================
+        # ROBOTS.TXT
+        # =====================================================
+        self.bp.route(
+            "/robots.txt"
+        )(
+            self.controller.robots_txt
+        )
+
+        # =====================================================
+        # SITEMAP.XML
+        # =====================================================
+        self.bp.route(
+            "/sitemap.xml"
+        )(
+            self.controller.sitemap_xml
+        )
 
         # =====================================================
         # SUBMIT INQUIRY
         #
-        # Protects the public form from spam.
-        #
         # Maximum:
-        # 5 submissions per minute per IP
-        # 20 submissions per hour per IP
+        # 5 requests per minute per IP
+        # 20 requests per hour per IP
         # =====================================================
-        inquiry_handler = limiter.limit(
-            "5 per minute; 20 per hour"
-        )(
-            self.controller.submit_inquiry
+        inquiry_handler = (
+            limiter.limit(
+                "5 per minute; 20 per hour"
+            )(
+                self.controller
+                .submit_inquiry
+            )
         )
 
         self.bp.route(
             "/inquiry",
-            methods=["POST"]
+            methods=[
+                "POST"
+            ]
         )(
             inquiry_handler
         )
-
 
         return self.bp

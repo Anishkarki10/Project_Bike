@@ -7,40 +7,73 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1"
+        content="width=device-width, initial-scale=1.0"
     >
+
+
+    <!-- =====================================================
+         PAGE TITLE
+    ====================================================== -->
+
+    <title>
+        {% block title %}
+        Supa Auto Link | Second-Hand Bikes in Kathmandu
+        {% endblock %}
+    </title>
+
+
+    <!-- =====================================================
+         SEO DESCRIPTION
+    ====================================================== -->
+
+    <meta
+        name="description"
+        content="{% block meta_description %}Buy, sell and exchange quality second-hand motorcycles and scooters in Kathmandu, Nepal with Supa Auto Link.{% endblock %}"
+    >
+
+
+    <!-- =====================================================
+         SEARCH ENGINE INDEXING
+
+         Admin pages are private and must never be indexed.
+    ====================================================== -->
 
     <meta
         name="robots"
         content="noindex, nofollow"
     >
 
-    <title>
-        {% block title %}
-        Admin — Supa Auto Link
-        {% endblock %}
-    </title>
-
 
     <!-- =====================================================
          FAVICON
     ====================================================== -->
+
     <link
         rel="icon"
         type="image/png"
         href="{{ url_for('static', filename='images/logo.png') }}"
     >
 
+    <link
+        rel="apple-touch-icon"
+        href="{{ url_for('static', filename='images/logo.png') }}"
+    >
+
 
     <!-- =====================================================
-         TAILWIND
+         FONT AWESOME
     ====================================================== -->
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
 
 
     <!-- =====================================================
          GOOGLE FONTS
     ====================================================== -->
+
     <link
         rel="preconnect"
         href="https://fonts.googleapis.com"
@@ -53,28 +86,31 @@
     >
 
     <link
-        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet"
     >
 
 
     <!-- =====================================================
-         FONT AWESOME
+         TAILWIND
     ====================================================== -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
 
 
     <!-- =====================================================
          CUSTOM CSS
     ====================================================== -->
+
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/site.css') }}"
     >
 
+
+    <!-- =====================================================
+         PAGE-SPECIFIC HEAD CONTENT
+    ====================================================== -->
 
     {% block head %}
     {% endblock %}
@@ -82,208 +118,198 @@
 </head>
 
 
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 text-gray-900">
 
 
-<div class="min-h-screen lg:flex">
+    {% set nav_items = [
+        ("Dashboard", "fa-gauge-high", "admin.dashboard", ["admin.dashboard", "admin.root"], false),
+        ("All Bikes", "fa-motorcycle", "admin.bikes", ["admin.bikes", "admin.add_bike", "admin.edit_bike", "admin.delete_bike", "admin.toggle_bike_status", "admin.mark_bike_sold"], false),
+        ("Inquiries", "fa-envelope", "admin.inquiries", ["admin.inquiries", "admin.update_inquiry"], true),
+        ("Sales & Profit", "fa-chart-line", "admin.sales", ["admin.sales", "admin.export_sales_csv"], false),
+        ("Settings", "fa-gear", "admin.settings", ["admin.settings", "admin.change_password"], false)
+    ] %}
 
 
-    <!-- =====================================================
-         SIDEBAR
-    ====================================================== -->
-    <aside
-        class="lg:w-64 bg-[#111] text-white p-5
-               lg:fixed lg:inset-y-0 lg:left-0"
-    >
+    <div class="lg:flex lg:min-h-screen">
 
 
         <!-- =================================================
-             LOGO
+             DESKTOP SIDEBAR
         ================================================== -->
-        <div
-            class="flex items-center gap-3
-                   border-b border-white/10 pb-5"
+        <aside
+            class="hidden lg:flex lg:flex-col
+                   lg:w-64 lg:fixed lg:inset-y-0 lg:left-0
+                   bg-[#111111] text-white z-40"
         >
 
-            <img
-                src="{{ url_for('static', filename='images/logo.png') }}"
-                alt="Supa Auto Link Logo"
-                class="w-12 h-12 bg-white rounded-lg object-contain"
+            <a
+                href="{{ url_for('admin.dashboard') }}"
+                class="flex items-center gap-3 px-5 h-20
+                       border-b border-white/10 flex-shrink-0"
             >
 
+                <img
+                    src="{{ url_for('static', filename='images/logo.png') }}"
+                    alt="Supa Auto Link"
+                    class="w-10 h-10 object-contain"
+                >
 
-            <div>
+                <div class="leading-tight">
 
-                <p class="font-display text-lg font-bold">
-                    SUPA AUTO LINK
-                </p>
+                    <p class="font-display text-lg font-extrabold tracking-wide">
+                        SUPA AUTO LINK
+                    </p>
 
-                <p class="text-[10px] text-gray-400">
-                    ADMIN PORTAL
-                </p>
+                    <p class="text-[10px] tracking-[0.2em] text-gray-400">
+                        ADMIN PANEL
+                    </p>
+
+                </div>
+
+            </a>
+
+
+            <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+
+                {% for label, icon, endpoint, active_endpoints, show_badge in nav_items %}
+
+                    <a
+                        href="{{ url_for(endpoint) }}"
+                        class="admin-link {% if request.endpoint in active_endpoints %}active{% endif %}"
+                    >
+
+                        <i class="fa-solid {{ icon }} w-4 text-center"></i>
+
+                        <span class="flex-1">{{ label }}</span>
+
+                        {% if show_badge and new_inquiries %}
+                            <span class="admin-badge">{{ new_inquiries }}</span>
+                        {% endif %}
+
+                    </a>
+
+                {% endfor %}
+
+            </nav>
+
+
+            <div class="px-3 py-4 border-t border-white/10 flex-shrink-0">
+
+                <div class="px-2 mb-3">
+
+                    <p class="text-sm font-semibold text-white truncate">
+                        {{ session.admin_name }}
+                    </p>
+
+                    <p class="text-xs text-gray-500">
+                        Administrator
+                    </p>
+
+                </div>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('admin.logout') }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <button
+                        type="submit"
+                        class="admin-link w-full"
+                    >
+                        <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
+                        <span class="flex-1 text-left">Logout</span>
+                    </button>
+
+                </form>
 
             </div>
+
+        </aside>
+
+
+
+        <!-- =================================================
+             MOBILE TOPBAR
+        ================================================== -->
+        <div
+            class="lg:hidden sticky top-0 z-40
+                   bg-[#111111] text-white
+                   flex items-center justify-between
+                   px-4 h-16"
+        >
+
+            <a
+                href="{{ url_for('admin.dashboard') }}"
+                class="flex items-center gap-2"
+            >
+
+                <img
+                    src="{{ url_for('static', filename='images/logo.png') }}"
+                    alt="Supa Auto Link"
+                    class="w-8 h-8 object-contain"
+                >
+
+                <span class="font-display text-base font-extrabold tracking-wide">
+                    ADMIN
+                </span>
+
+            </a>
+
+            <button
+                type="button"
+                data-menu-button
+                class="w-10 h-10 rounded-lg border border-white/15
+                       flex items-center justify-center"
+                aria-label="Toggle admin navigation menu"
+                aria-expanded="false"
+                aria-controls="admin-mobile-navigation"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
 
         </div>
 
 
         <!-- =================================================
-             NAVIGATION
-        ================================================== -->
-        <nav class="mt-6 space-y-1 text-sm">
-
-
-            <!-- DASHBOARD -->
-            <a
-                href="{{ url_for('admin.dashboard') }}"
-                class="admin-link
-                {% if request.endpoint == 'admin.dashboard' %}
-                    bg-red-600 text-white
-                {% endif %}
-                "
-            >
-
-                <i class="fa-solid fa-gauge-high w-5"></i>
-
-                Dashboard
-
-            </a>
-
-
-            <!-- ALL BIKES -->
-            <a
-                href="{{ url_for('admin.bikes') }}"
-                class="admin-link
-                {% if request.endpoint == 'admin.bikes' %}
-                    bg-red-600 text-white
-                {% endif %}
-                "
-            >
-
-                <i class="fa-solid fa-motorcycle w-5"></i>
-
-                All Bikes
-
-            </a>
-
-
-            <!-- ADD BIKE -->
-            <a
-                href="{{ url_for('admin.add_bike') }}"
-                class="admin-link
-                {% if request.endpoint == 'admin.add_bike' %}
-                    bg-red-600 text-white
-                {% endif %}
-                "
-            >
-
-                <i class="fa-solid fa-plus w-5"></i>
-
-                Add New Bike
-
-            </a>
-
-
-            <!-- SALES -->
-            <a
-                href="{{ url_for('admin.sales') }}"
-                class="admin-link
-                {% if request.endpoint == 'admin.sales' %}
-                    bg-red-600 text-white
-                {% endif %}
-                "
-            >
-
-                <i class="fa-solid fa-chart-line w-5"></i>
-
-                Sales & Profit
-
-            </a>
-
-
-            <!-- INQUIRIES -->
-            <a
-                href="{{ url_for('admin.inquiries') }}"
-                class="admin-link flex justify-between
-                {% if request.endpoint == 'admin.inquiries' %}
-                    bg-red-600 text-white
-                {% endif %}
-                "
-            >
-
-                <span class="flex items-center gap-2">
-
-                    <i class="fa-solid fa-envelope w-5"></i>
-
-                    Customer Inquiries
-
-                </span>
-
-
-                {% if new_inquiries %}
-
-                    <span
-                        class="bg-red-600 px-2 py-0.5
-                               rounded-full text-[10px]"
-                    >
-                        {{ new_inquiries }}
-                    </span>
-
-                {% endif %}
-
-            </a>
-
-
-            <!-- SETTINGS -->
-            <a
-                href="{{ url_for('admin.settings') }}"
-                class="admin-link
-                {% if request.endpoint == 'admin.settings' %}
-                    bg-red-600 text-white
-                {% endif %}
-                "
-            >
-
-                <i class="fa-solid fa-gear w-5"></i>
-
-                Settings
-
-            </a>
-
-        </nav>
-
-
-        <!-- =================================================
-             BOTTOM SIDEBAR
+             MOBILE NAVIGATION
         ================================================== -->
         <div
-            class="mt-8 pt-5 border-t border-white/10"
+            id="admin-mobile-navigation"
+            data-mobile-menu
+            class="hidden lg:hidden bg-[#111111] text-white
+                   px-3 py-3 space-y-1
+                   border-b border-white/10"
         >
 
+            {% for label, icon, endpoint, active_endpoints, show_badge in nav_items %}
 
-            <!-- PUBLIC SITE -->
-            <a
-                class="admin-link"
-                href="{{ url_for('public.home') }}"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
+                <a
+                    href="{{ url_for(endpoint) }}"
+                    class="admin-link {% if request.endpoint in active_endpoints %}active{% endif %}"
+                >
 
-                <i class="fa-solid fa-arrow-up-right-from-square w-5"></i>
+                    <i class="fa-solid {{ icon }} w-4 text-center"></i>
 
-                View Public Site
+                    <span class="flex-1">{{ label }}</span>
 
-            </a>
+                    {% if show_badge and new_inquiries %}
+                        <span class="admin-badge">{{ new_inquiries }}</span>
+                    {% endif %}
 
+                </a>
 
-            <!-- =================================================
-                 LOGOUT
-                 POST + CSRF
-            ================================================== -->
+            {% endfor %}
+
             <form
                 method="POST"
                 action="{{ url_for('admin.logout') }}"
-                class="mt-1"
+                class="pt-1 mt-1 border-t border-white/10"
             >
 
                 <input
@@ -294,111 +320,136 @@
 
                 <button
                     type="submit"
-                    class="admin-link text-red-400
-                           w-full text-left"
+                    class="admin-link w-full"
                 >
-
-                    <i class="fa-solid fa-right-from-bracket w-5"></i>
-
-                    Logout
-
+                    <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
+                    <span class="flex-1 text-left">Logout</span>
                 </button>
 
             </form>
 
         </div>
 
-    </aside>
+
+
+        <!-- =================================================
+             MAIN COLUMN
+        ================================================== -->
+        <div class="flex-1 min-w-0 lg:ml-64">
+
 
 
     <!-- =====================================================
-         MAIN CONTENT
+         FLASH MESSAGES
     ====================================================== -->
-    <main
-        class="flex-1 lg:ml-64"
-    >
 
-        <div
-            class="px-4 sm:px-6 lg:px-8 py-8"
-        >
+    {% with messages = get_flashed_messages(with_categories=true) %}
 
+        {% if messages %}
 
-            <!-- =============================================
-                 FLASH MESSAGES
-            ============================================== -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
+            <div
+                class="
+                    fixed
+                    top-20
+                    right-4
+                    z-[100]
+                    space-y-2
+                    max-w-sm
+                "
+                aria-live="polite"
+            >
 
-                {% if messages %}
+                {% for category, message in messages %}
 
                     <div
-                        class="space-y-2 mb-5"
-                        aria-live="polite"
+                        role="status"
+
+                        class="
+                            rounded-xl
+                            px-4
+                            py-3
+                            shadow-lg
+                            border
+                            text-sm
+                            font-medium
+                            bg-white
+
+                            {% if category == 'success' %}
+
+                                border-green-200
+                                text-green-700
+
+                            {% elif category == 'danger' %}
+
+                                border-red-200
+                                text-red-700
+
+                            {% else %}
+
+                                border-amber-200
+                                text-amber-700
+
+                            {% endif %}
+                        "
                     >
 
-                        {% for category, message in messages %}
-
-                            <div
-                                role="status"
-                                class="
-                                    rounded-xl
-                                    px-4 py-3
-                                    bg-white
-                                    border
-                                    text-sm
-                                    font-medium
-
-                                    {% if category == 'success' %}
-                                        border-green-200
-                                        text-green-700
-
-                                    {% elif category == 'warning' %}
-                                        border-yellow-200
-                                        text-yellow-700
-
-                                    {% else %}
-                                        border-red-200
-                                        text-red-700
-                                    {% endif %}
-                                "
-                            >
-
-                                {{ message }}
-
-                            </div>
-
-                        {% endfor %}
+                        {{ message }}
 
                     </div>
 
-                {% endif %}
+                {% endfor %}
 
-            {% endwith %}
+            </div>
+
+        {% endif %}
+
+    {% endwith %}
+
 
 
             <!-- =============================================
                  PAGE CONTENT
             ============================================== -->
-            {% block content %}
-            {% endblock %}
+
+            <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
+
+                {% block content %}
+                {% endblock %}
+
+            </main>
+
+
+
+            <!-- =============================================
+                 ADMIN FOOTER
+            ============================================== -->
+
+            <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+
+                <p class="text-xs text-gray-400 border-t border-gray-200 pt-5">
+                    Supa Auto Link — Admin Panel
+                </p>
+
+            </footer>
 
         </div>
 
-    </main>
-
-</div>
+    </div>
 
 
-<!-- =====================================================
-     JAVASCRIPT
-====================================================== -->
-<script
-    src="{{ url_for('static', filename='js/site.js') }}"
-    defer
-></script>
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script
+        src="{{ url_for('static', filename='js/site.js') }}"
+        defer
+    ></script>
 
 
-{% block scripts %}
-{% endblock %}
+    {% block scripts %}
+    {% endblock %}
 
 
 </body>

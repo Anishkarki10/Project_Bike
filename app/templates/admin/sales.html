@@ -4,13 +4,13 @@
 
 {% block content %}
 
-<div class="p-6">
+<div>
 
     <!-- PAGE HEADER -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">
+            <h1 class="font-display text-4xl font-extrabold text-gray-900">
                 Sales & Profit
             </h1>
 
@@ -21,9 +21,10 @@
 
         <a
             href="{{ url_for('admin.export_sales_csv', month=selected_month, year=selected_year) }}"
-            class="inline-flex items-center justify-center gap-2 px-5 py-3
-                   bg-green-600 text-white font-semibold rounded-xl
-                   hover:bg-green-700 transition shadow-sm"
+            class="inline-flex items-center justify-center gap-2
+                   px-5 py-3 rounded-xl
+                   bg-green-600 text-white font-semibold
+                   hover:bg-green-700 transition"
         >
             <i class="fa-solid fa-file-csv"></i>
             Export CSV
@@ -36,79 +37,64 @@
     <form
         action="{{ url_for('admin.sales') }}"
         method="GET"
-        class="bg-white border border-gray-200 rounded-2xl p-5 mb-8 shadow-sm"
+        class="grid sm:grid-cols-3 gap-3
+               mt-6 bg-white border border-gray-200
+               rounded-2xl p-4"
     >
 
-        <div class="flex flex-col md:flex-row gap-4 md:items-end">
+        <!-- MONTH -->
+        <select
+            name="month"
+            class="field"
+        >
 
-            <!-- MONTH -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Month
-                </label>
+            {% for number, name in months %}
 
-                <select
-                    name="month"
-                    class="border border-gray-300 rounded-xl px-4 py-3 bg-white"
-                >
-
-                    {% for number, name in months %}
-
-                    <option
-                        value="{{ number }}"
-                        {% if number == selected_month %}selected{% endif %}
-                    >
-                        {{ name }}
-                    </option>
-
-                    {% endfor %}
-
-                </select>
-            </div>
-
-
-            <!-- YEAR -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Year
-                </label>
-
-                <select
-                    name="year"
-                    class="border border-gray-300 rounded-xl px-4 py-3 bg-white"
-                >
-
-                    {% for year in years %}
-
-                    <option
-                        value="{{ year }}"
-                        {% if year == selected_year %}selected{% endif %}
-                    >
-                        {{ year }}
-                    </option>
-
-                    {% endfor %}
-
-                </select>
-            </div>
-
-
-            <button
-                type="submit"
-                class="px-5 py-3 bg-gray-900 text-white rounded-xl
-                       font-semibold hover:bg-black transition"
+            <option
+                value="{{ number }}"
+                {% if number == selected_month %}selected{% endif %}
             >
-                <i class="fa-solid fa-filter mr-2"></i>
-                Apply Filter
-            </button>
+                {{ name }}
+            </option>
 
-        </div>
+            {% endfor %}
+
+        </select>
+
+
+        <!-- YEAR -->
+        <select
+            name="year"
+            class="field"
+        >
+
+            {% for year in years %}
+
+            <option
+                value="{{ year }}"
+                {% if year == selected_year %}selected{% endif %}
+            >
+                {{ year }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <button
+            type="submit"
+            class="btn-red"
+        >
+            <i class="fa-solid fa-filter mr-2"></i>
+            Apply Filter
+        </button>
 
     </form>
 
 
     <!-- SUMMARY CARDS -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mt-7">
 
 
         <!-- BIKES SOLD -->
@@ -214,7 +200,7 @@
 
 
     <!-- PROFIT FORMULA -->
-    <div class="bg-green-50 border border-green-200 rounded-2xl p-5 mb-8">
+    <div class="bg-green-50 border border-green-200 rounded-2xl p-5 mt-7">
 
         <div class="flex items-center gap-3">
 
@@ -238,7 +224,7 @@
 
 
     <!-- SALES HISTORY -->
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden mt-7">
 
         <div class="px-6 py-5 border-b border-gray-200">
 

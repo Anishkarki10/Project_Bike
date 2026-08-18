@@ -7,6 +7,8 @@ from flask import (
     render_template
 )
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 from app.extensions import (
     csrf,
     limiter
@@ -25,6 +27,31 @@ import config
 def create_app(testing=False):
 
     app = Flask(__name__)
+
+    # =====================================================
+    # REVERSE PROXY SUPPORT
+    #
+    # Required when Flask is behind Nginx / Cloudflare.
+    # This lets Flask correctly detect:
+    #
+    # - HTTPS
+    # - real hostname
+    # - forwarded client IP
+    #
+    # so url_for(..., _external=True) generates:
+    #
+    # https://supaautolink.com.np/...
+    #
+    # instead of:
+    #
+    # http://127.0.0.1:8000/...
+    # =====================================================
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app,
+        x_for=1,
+        x_proto=1,
+        x_host=1
+    )
 
     # =====================================================
     # BASIC CONFIGURATION
@@ -128,22 +155,57 @@ def create_app(testing=False):
     # =====================================================
     # TEMPLATE GLOBALS
     #
-    # Makes current_year available to every template
-    # (used in the footer copyright line).
+    # Makes current_year available to every template.
     # =====================================================
     @app.context_processor
     def inject_globals():
 
         return {
-            "current_year": datetime.now().year
+            "current_year":
+                datetime.now().year
         }
+
+
+    # =====================================================
+    # SECURITY HEADERS
+    # =====================================================
+    @app.after_request
+    def add_security_headers(
+        response
+    ):
+
+        response.headers[
+            "X-Content-Type-Options"
+        ] = "nosniff"
+
+        response.headers[
+            "X-Frame-Options"
+        ] = "SAMEORIGIN"
+
+        response.headers[
+            "Referrer-Policy"
+        ] = (
+            "strict-origin-when-cross-origin"
+        )
+
+        response.headers[
+            "Permissions-Policy"
+        ] = (
+            "camera=(), "
+            "microphone=(), "
+            "geolocation=()"
+        )
+
+        return response
 
 
     # =====================================================
     # 404 ERROR
     # =====================================================
     @app.errorhandler(404)
-    def page_not_found(error):
+    def page_not_found(
+        error
+    ):
 
         return render_template(
             "notfound.html"
@@ -154,7 +216,9 @@ def create_app(testing=False):
     # 413 FILE TOO LARGE
     # =====================================================
     @app.errorhandler(413)
-    def file_too_large(error):
+    def file_too_large(
+        error
+    ):
 
         return render_template(
             "notfound.html"
@@ -165,10 +229,12 @@ def create_app(testing=False):
     # 429 TOO MANY REQUESTS
     # =====================================================
     @app.errorhandler(429)
-    def too_many_requests(error):
+    def too_many_requests(
+        error
+    ):
 
         return (
-            "Too many login attempts. "
+            "Too many requests. "
             "Please wait and try again.",
             429
         )

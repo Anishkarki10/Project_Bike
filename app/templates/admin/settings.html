@@ -289,7 +289,7 @@ Settings — Admin
         <!-- =================================================
              ACTIONS
         ================================================== -->
-        <div class="flex flex-wrap gap-3 pb-8">
+        <div class="flex flex-wrap gap-3">
 
             <button
                 type="submit"
@@ -308,6 +308,102 @@ Settings — Admin
             </a>
 
         </div>
+
+    </form>
+
+
+    <!-- =====================================================
+         CHANGE PASSWORD
+    ====================================================== -->
+    <form
+        method="POST"
+        action="{{ url_for('admin.change_password') }}"
+        class="space-y-6 mt-7 max-w-4xl"
+    >
+
+        <!-- CSRF PROTECTION -->
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+        <section class="form-card">
+
+            <div class="flex items-center gap-3 mb-1">
+
+                <div
+                    class="w-9 h-9 rounded-lg bg-red-50
+                           flex items-center justify-center flex-shrink-0"
+                >
+                    <i class="fa-solid fa-key text-red-600 text-sm"></i>
+                </div>
+
+                <h2 class="font-display text-2xl font-extrabold">
+                    Change Password
+                </h2>
+
+            </div>
+
+            <p class="text-sm text-gray-500 mb-5">
+                Update the password used to sign in to this admin panel.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-4">
+
+                <div class="md:col-span-2">
+                    <label class="label">Current Password</label>
+                    <input
+                        class="field"
+                        type="password"
+                        name="current_password"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label class="label">New Password</label>
+                    <input
+                        class="field"
+                        type="password"
+                        name="new_password"
+                        minlength="12"
+                        maxlength="255"
+                        autocomplete="new-password"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label class="label">Confirm New Password</label>
+                    <input
+                        class="field"
+                        type="password"
+                        name="confirm_password"
+                        minlength="12"
+                        maxlength="255"
+                        autocomplete="new-password"
+                        required
+                    >
+                </div>
+
+                <p class="text-xs text-gray-400 md:col-span-2">
+                    Must be at least 12 characters long.
+                </p>
+
+            </div>
+
+            <div class="pt-2">
+                <button
+                    type="submit"
+                    class="btn-red px-7 py-3"
+                >
+                    Change Password
+                </button>
+            </div>
+
+        </section>
 
     </form>
 
