@@ -22,6 +22,7 @@ from app.models.user import User
 from app.models.bike import Bike
 from app.models.inquiry import Inquiry
 from app.models.settings import Settings
+from app.models.expense import Expense
 
 import config
 
@@ -37,6 +38,7 @@ class AdminController:
         self.bike_model = Bike()
         self.inquiry_model = Inquiry()
         self.settings_model = Settings()
+        self.expense_model = Expense()
 
     # =========================================================
     # ADMIN LOGIN
@@ -1905,6 +1907,44 @@ class AdminController:
             )
         )
 
+        expenses = (
+            self.expense_model
+            .get_all(
+                year=selected_year,
+                month=selected_month
+            )
+        )
+
+        business_expenses_total = (
+            self.expense_model
+            .get_monthly_total(
+                selected_year,
+                selected_month
+            )
+        )
+
+        # -----------------------------------------------------
+        # Roll business expenses (rent, salary, etc.) into the
+        # month's net profit alongside per-bike expenses.
+        # -----------------------------------------------------
+        summary["business_expenses_total"] = (
+            business_expenses_total
+        )
+
+        summary["net_profit"] = (
+            (summary.get("net_profit") or 0)
+            - business_expenses_total
+        )
+
+        expense_categories = [
+            "Rent",
+            "Salary",
+            "Utilities",
+            "Maintenance",
+            "Marketing",
+            "Other"
+        ]
+
         months = [
             (1, "January"),
             (2, "February"),
@@ -1935,6 +1975,12 @@ class AdminController:
 
             summary=summary,
 
+            expenses=expenses,
+
+            expense_categories=(
+                expense_categories
+            ),
+
             months=months,
 
             years=years,
@@ -1950,6 +1996,141 @@ class AdminController:
             new_inquiries=(
                 self.inquiry_model
                 .count_new()
+            )
+        )
+
+    # =========================================================
+    # ADD BUSINESS EXPENSE (rent, salary, etc.)
+    # =========================================================
+    def add_expense(self):
+
+        redirect_month = (
+            request.form.get(
+                "month",
+                type=int
+            )
+        )
+
+        redirect_year = (
+            request.form.get(
+                "year",
+                type=int
+            )
+        )
+
+        title = (
+            request.form.get(
+                "title",
+                ""
+            )
+            .strip()
+        )
+
+        category = (
+            request.form.get(
+                "category",
+                "Other"
+            )
+            .strip()[:50]
+            or "Other"
+        )
+
+        amount = (
+            self._float_or_none(
+                request.form.get(
+                    "amount"
+                )
+            )
+        )
+
+        expense_date = (
+            self._date_or_none(
+                request.form.get(
+                    "expense_date"
+                )
+            )
+        )
+
+        notes = (
+            request.form.get(
+                "notes",
+                ""
+            )
+            .strip()
+        )
+
+        if (
+            not title
+            or amount is None
+            or amount <= 0
+            or not expense_date
+        ):
+
+            flash(
+                "Please provide a valid title, "
+                "amount and date for the expense.",
+                "danger"
+            )
+
+        else:
+
+            self.expense_model.save({
+                "title": title,
+                "category": category,
+                "amount": amount,
+                "expense_date": expense_date,
+                "notes": notes or None
+            })
+
+            flash(
+                "Expense added successfully.",
+                "success"
+            )
+
+        return redirect(
+            url_for(
+                "admin.sales",
+                month=redirect_month,
+                year=redirect_year
+            )
+        )
+
+    # =========================================================
+    # DELETE BUSINESS EXPENSE
+    # =========================================================
+    def delete_expense(
+        self,
+        expense_id
+    ):
+
+        redirect_month = (
+            request.form.get(
+                "month",
+                type=int
+            )
+        )
+
+        redirect_year = (
+            request.form.get(
+                "year",
+                type=int
+            )
+        )
+
+        self.expense_model.delete_by_id(
+            expense_id
+        )
+
+        flash(
+            "Expense removed.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "admin.sales",
+                month=redirect_month,
+                year=redirect_year
             )
         )
 
@@ -2057,6 +2238,66 @@ class AdminController:
                     "net_profit"
                 )
             ])
+
+        # -----------------------------------------------------
+        # Business expenses (rent, salary, etc.) for the
+        # same period, plus an overall net profit total.
+        # -----------------------------------------------------
+        expenses = (
+            self.expense_model
+            .get_all(
+                year=selected_year,
+                month=selected_month
+            )
+        )
+
+        business_expenses_total = sum(
+            (expense.get("amount") or 0)
+            for expense in expenses
+        )
+
+        bikes_net_profit = sum(
+            (bike.get("net_profit") or 0)
+            for bike in sales
+        )
+
+        writer.writerow([])
+
+        writer.writerow([
+            "Business Expenses"
+        ])
+
+        writer.writerow([
+            "Title",
+            "Category",
+            "Date",
+            "Amount",
+            "Notes"
+        ])
+
+        for expense in expenses:
+
+            writer.writerow([
+                expense.get("title"),
+                expense.get("category"),
+                expense.get("expense_date"),
+                expense.get("amount"),
+                expense.get("notes")
+            ])
+
+        writer.writerow([])
+
+        writer.writerow([
+            "Total Business Expenses",
+            business_expenses_total
+        ])
+
+        writer.writerow([
+            "Overall Net Profit "
+            "(after business expenses)",
+            bikes_net_profit
+            - business_expenses_total
+        ])
 
         filename = (
             "supa_auto_link_"

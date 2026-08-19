@@ -94,7 +94,7 @@
 
 
     <!-- SUMMARY CARDS -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mt-7">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mt-7">
 
 
         <!-- BIKES SOLD -->
@@ -169,6 +169,24 @@
         </div>
 
 
+        <!-- BUSINESS EXPENSES -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+
+            <div class="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center mb-4">
+                <i class="fa-solid fa-building text-amber-600"></i>
+            </div>
+
+            <p class="text-sm text-gray-500">
+                Business Expenses
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-1">
+                Rs. {{ "{:,.2f}".format(summary.business_expenses_total or 0) }}
+            </h2>
+
+        </div>
+
+
         <!-- NET PROFIT -->
         <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
 
@@ -214,11 +232,205 @@
                 </h3>
 
                 <p class="text-sm text-green-800 mt-1">
-                    Net Profit = Sold Price - Purchase Price - Additional Expenses
+                    Net Profit = (Sold Price - Purchase Price - Additional Expenses) - Business Expenses (Rent, Salary, etc.)
                 </p>
             </div>
 
         </div>
+
+    </div>
+
+
+    <!-- BUSINESS EXPENSES -->
+    <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden mt-7">
+
+        <div class="px-6 py-5 border-b border-gray-200">
+
+            <h2 class="text-xl font-bold text-gray-900">
+                Business Expenses
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+                Rent, salary and other recurring costs for the selected month — deducted from Net Profit above.
+            </p>
+
+        </div>
+
+
+        <!-- ADD EXPENSE FORM -->
+        <form
+            action="{{ url_for('admin.add_expense') }}"
+            method="POST"
+            class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 p-6 border-b border-gray-200 bg-gray-50"
+        >
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+            <input
+                type="hidden"
+                name="month"
+                value="{{ selected_month }}"
+            >
+
+            <input
+                type="hidden"
+                name="year"
+                value="{{ selected_year }}"
+            >
+
+            <input
+                type="text"
+                name="title"
+                placeholder="e.g. Shop Rent"
+                required
+                class="field"
+            >
+
+            <select
+                name="category"
+                class="field"
+            >
+
+                {% for cat in expense_categories %}
+                <option value="{{ cat }}">{{ cat }}</option>
+                {% endfor %}
+
+            </select>
+
+            <input
+                type="number"
+                name="amount"
+                step="0.01"
+                min="0.01"
+                placeholder="Amount"
+                required
+                class="field"
+            >
+
+            <input
+                type="date"
+                name="expense_date"
+                required
+                class="field"
+            >
+
+            <button
+                type="submit"
+                class="btn-red"
+            >
+                <i class="fa-solid fa-plus mr-2"></i>
+                Add Expense
+            </button>
+
+        </form>
+
+
+        {% if expenses %}
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full text-sm">
+
+                <thead class="bg-gray-50 text-gray-600">
+
+                    <tr>
+
+                        <th class="px-5 py-4 text-left">Title</th>
+                        <th class="px-5 py-4 text-left">Category</th>
+                        <th class="px-5 py-4 text-left">Date</th>
+                        <th class="px-5 py-4 text-right">Amount</th>
+                        <th class="px-5 py-4 text-right">Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody class="divide-y divide-gray-100">
+
+                    {% for expense in expenses %}
+
+                    <tr class="hover:bg-gray-50">
+
+                        <td class="px-5 py-4 font-semibold text-gray-900">
+                            {{ expense.title }}
+                        </td>
+
+                        <td class="px-5 py-4">
+                            <span class="inline-flex px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold">
+                                {{ expense.category }}
+                            </span>
+                        </td>
+
+                        <td class="px-5 py-4 text-gray-600">
+                            {{ expense.expense_date }}
+                        </td>
+
+                        <td class="px-5 py-4 text-right font-semibold">
+                            Rs. {{ "{:,.2f}".format(expense.amount or 0) }}
+                        </td>
+
+                        <td class="px-5 py-4 text-right">
+
+                            <form
+                                action="{{ url_for('admin.delete_expense', expense_id=expense.id) }}"
+                                method="POST"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="month"
+                                    value="{{ selected_month }}"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="year"
+                                    value="{{ selected_year }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="text-red-600 hover:text-red-800"
+                                    title="Delete expense"
+                                >
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="py-12 text-center">
+
+            <p class="text-gray-500">
+                No business expenses recorded for the selected month.
+            </p>
+
+        </div>
+
+        {% endif %}
 
     </div>
 
@@ -449,7 +661,7 @@
 
 
     <!-- MONTHLY TOTAL -->
-    {% if sales %}
+    {% if sales or expenses %}
 
     <div class="mt-6 bg-gray-900 text-white rounded-2xl p-6">
 
@@ -478,7 +690,7 @@
             </div>
 
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
 
                 <div>
                     <p class="text-gray-400 text-sm">
@@ -504,11 +716,22 @@
 
                 <div>
                     <p class="text-gray-400 text-sm">
-                        Expenses
+                        Bike Expenses
                     </p>
 
                     <p class="font-semibold mt-1">
                         Rs. {{ "{:,.2f}".format(summary.total_expenses or 0) }}
+                    </p>
+                </div>
+
+
+                <div>
+                    <p class="text-gray-400 text-sm">
+                        Business Expenses
+                    </p>
+
+                    <p class="font-semibold mt-1">
+                        Rs. {{ "{:,.2f}".format(summary.business_expenses_total or 0) }}
                     </p>
                 </div>
 

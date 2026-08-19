@@ -289,6 +289,35 @@ class AdminRoutes:
 
 
         # =====================================================
+        # BUSINESS EXPENSES (rent, salary, etc.)
+        # =====================================================
+        self.bp.route(
+            "/expenses/add",
+            methods=[
+                "POST"
+            ],
+            endpoint="add_expense"
+        )(
+            admin_required(
+                self.controller.add_expense
+            )
+        )
+
+
+        self.bp.route(
+            "/expenses/<int:expense_id>/delete",
+            methods=[
+                "POST"
+            ],
+            endpoint="delete_expense"
+        )(
+            admin_required(
+                self.controller.delete_expense
+            )
+        )
+
+
+        # =====================================================
         # RETURN BLUEPRINT
         # =====================================================
         return self.bp

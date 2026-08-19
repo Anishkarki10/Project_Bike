@@ -432,6 +432,38 @@ class Database:
         )
 
         # =====================================================
+        # BUSINESS EXPENSES (rent, salary, utilities, etc.)
+        # =====================================================
+        db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS expenses (
+
+                id INT AUTO_INCREMENT PRIMARY KEY,
+
+                title VARCHAR(150)
+                NOT NULL,
+
+                category VARCHAR(50)
+                NOT NULL
+                DEFAULT 'other',
+
+                amount DECIMAL(12,2)
+                NOT NULL,
+
+                expense_date DATE
+                NOT NULL,
+
+                notes VARCHAR(500)
+                NULL,
+
+                created_at TIMESTAMP
+                DEFAULT CURRENT_TIMESTAMP
+
+            ) ENGINE=InnoDB
+            """
+        )
+
+        # =====================================================
         # BIKE IMAGES
         # =====================================================
         db.execute(
